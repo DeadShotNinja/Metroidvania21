@@ -18,12 +18,6 @@ namespace Metro
 		public override void LogicUpdate()
 		{
 			base.LogicUpdate();
-			
-			if (_entity.Collision.IsWallLeft && _entity.InputProvider.MoveInput.x < 0f
-			    || _entity.Collision.IsWallRight && _entity.InputProvider.MoveInput.x > 0f)
-			{
-				_entity.MovementStateMachine.ChangeState(_entity.WallSlideAirborneState);
-			}
 		}
 
 		public override void PhysicsUpdate()

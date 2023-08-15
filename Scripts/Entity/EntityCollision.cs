@@ -73,14 +73,15 @@ namespace Metro
         
              _landingThisFrame = false; 
              bool groundedCheck = RunDetection(_raysDown, _groundLayer);
+             bool wallGroundCheck = RunDetection(_raysDown, _wallLayer);
              if (_colDown && !groundedCheck) TimeLeftGrounded = Time.time; 
              else if (!_colDown && groundedCheck)
              {
                  IsCoyoteUsable = true;
                  _landingThisFrame = true;
              }
-            
-             _colDown = groundedCheck;
+
+             _colDown = groundedCheck || wallGroundCheck;
              //_colUp = RunDetection(_raysUp);
              _colLeft = RunDetection(_raysLeft, _wallLayer);
              _colRight = RunDetection(_raysRight, _wallLayer);

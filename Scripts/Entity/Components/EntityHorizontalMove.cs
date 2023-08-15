@@ -17,6 +17,9 @@ namespace Metro
         [Tooltip("Bonus speed applied when the entity is at the apex of a jump or fall.")]
         [SerializeField] private float _apexBonus = 2f;
 
+        [Header("Dash")]
+        [SerializeField] private bool _allowDash = true;
+
         private Rigidbody2D _rb;
         
         public override void Initialize(BaseEntity entity)

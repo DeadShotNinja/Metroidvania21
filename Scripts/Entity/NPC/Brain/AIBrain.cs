@@ -19,6 +19,7 @@ namespace Metro
         public NPCEntity NPC { get; private set; }
         public Vector2 MoveInput { get; set; }
         public InputState JumpInput { get; set; }
+        public InputState DashInput { get; set; }
         public StateMachine<BaseBehaviourState> BehaviourStateMachine { get; private set; }
 
         #region Behaviour States

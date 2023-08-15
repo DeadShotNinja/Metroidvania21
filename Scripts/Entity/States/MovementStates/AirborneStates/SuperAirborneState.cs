@@ -4,7 +4,6 @@ namespace Metro
 {
 	public abstract class SuperAirborneState : BaseMovementState
 	{
-		private float _stateEvalBuffer = 0.05f;
 		private float _bufferTimer;
 		
 		public SuperAirborneState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine)
@@ -23,6 +22,19 @@ namespace Metro
 			base.LogicUpdate();
 
 			if (_bufferTimer > Time.time) return;
+			
+			if (_entity.Collision.IsWallLeft && _entity.InputProvider.MoveInput.x < 0f
+			    || _entity.Collision.IsWallRight && _entity.InputProvider.MoveInput.x > 0f)
+			{
+				_entity.MovementStateMachine.ChangeState(_entity.WallSlideWallingState);
+				return;
+			}
+			
+			if (_jump != null && _entity.InputProvider.JumpInput.Pressed)
+			{
+				_entity.MovementStateMachine.ChangeState(_entity.JumpAirborneState);
+				return;
+			}
 			
 			if (_entity.Collision.IsGrounded || _entity.EntityRigidbody.velocity.y == 0f)
 			{

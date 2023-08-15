@@ -17,7 +17,17 @@ namespace Metro
 		{
 			base.LogicUpdate();
 			
-			if (_entity.EntityRigidbody.velocity.y > 0f)
+			if (_jump != null && _entity.InputProvider.JumpInput.Pressed)
+			{
+				_entity.MovementStateMachine.ChangeState(_entity.JumpAirborneState);
+				return;
+			}
+			else if (_horizontalMove != null && _entity.InputProvider.DashInput.Pressed)
+			{
+				_entity.MovementStateMachine.ChangeState(_entity.DashMovementState);
+				return;
+			}
+			else if (_entity.EntityRigidbody.velocity.y > 0f)
 			{
 				_entity.MovementStateMachine.ChangeState(_entity.JumpAirborneState);
 				return;

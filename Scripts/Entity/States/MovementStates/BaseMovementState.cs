@@ -13,7 +13,7 @@ namespace Metro
         //protected EntityDash _dash;
         protected EntityWallSlide _wallSlide;
 
-        
+        protected float _stateEvalBuffer = 0.05f;
         
         protected BaseMovementState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(stateMachine)
         {
@@ -47,12 +47,12 @@ namespace Metro
         public override void LogicUpdate()
         {
             base.LogicUpdate();
-
-            if (_jump != null && _entity.InputProvider.JumpInput.Pressed)
-            {
-                _entity.MovementStateMachine.ChangeState(_entity.JumpAirborneState);
-                return;
-            }
+            
+            // if (_jump != null && _entity.InputProvider.JumpInput.Pressed)
+            // {
+            //     _entity.MovementStateMachine.ChangeState(_entity.JumpAirborneState);
+            //     return;
+            // }
             
             // Check for dash
         }

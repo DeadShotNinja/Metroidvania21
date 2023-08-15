@@ -1,7 +1,6 @@
 using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.Serialization;
 using TMPro;
 
 namespace Metro
@@ -9,8 +8,8 @@ namespace Metro
     /// <summary>
     /// Base class for all entities.
     /// </summary>
-    [RequireComponent(typeof(EntityHorizontalMove))]
     [RequireComponent(typeof(Rigidbody2D))]
+    [RequireComponent(typeof(Collider2D))]
     public abstract class BaseEntity : MonoBehaviour
     {
         [InfoBox("Physics")]
@@ -34,7 +33,8 @@ namespace Metro
         // Airborne
         public JumpAirborneState JumpAirborneState { get; private set; }
         public FallAirborneState FallAirborneState { get; private set; }
-        public WallSlideAirborneState WallSlideAirborneState { get; private set; }
+        public WallSlideWallingState WallSlideWallingState { get; private set; }
+        public WallJumpWallingState WallJumpWallingState { get; private set; }
         // Grounded
         public IdleGroundedState IdleGroundedState { get; private set; }
         public MoveGroundedState MoveGroundedState { get; private set; }
@@ -49,7 +49,7 @@ namespace Metro
             
             _collision.Initialize(this);
             _gravity.Initialize(this);
-            EntityComponents = GetComponents<EntityComponent>();
+            EntityComponents = GetComponentsInChildren<EntityComponent>();
             InitializeComponents();
             
             MovementStateMachine = new StateMachine<BaseMovementState>();
@@ -57,7 +57,8 @@ namespace Metro
             // Airborne
             JumpAirborneState = new JumpAirborneState(this, MovementStateMachine);
             FallAirborneState = new FallAirborneState(this, MovementStateMachine);
-            WallSlideAirborneState = new WallSlideAirborneState(this, MovementStateMachine);
+            WallSlideWallingState = new WallSlideWallingState(this, MovementStateMachine);
+            WallJumpWallingState = new WallJumpWallingState(this, MovementStateMachine);
             // Grounded
             IdleGroundedState = new IdleGroundedState(this, MovementStateMachine);
             MoveGroundedState = new MoveGroundedState(this, MovementStateMachine);

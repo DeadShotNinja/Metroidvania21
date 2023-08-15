@@ -20,11 +20,17 @@ namespace Metro
         [SerializeField] private float _jumpBuffer = 0.1f;
 
         [Header("Wall Jumping")]
+        [Tooltip("If enabled, will allow this entity to wall jump.")]
         [SerializeField] private bool _allowWallJumping = true;
+        [Tooltip("How high UP can this entity jump.")]
         [ShowIf(nameof(_allowWallJumping))]
         [SerializeField] private float _wallJumpHeight = 30f;
+        [Tooltip("How far to the SIDE can this entity jump.")]
         [ShowIf(nameof(_allowWallJumping))]
-        [SerializeField] private float _wallJumpDistance = 30f;
+        [SerializeField] private float _wallJumpDistance = 20f;
+        [Tooltip("Minimum time this entity has to be in a jumping state.")]
+        [ShowIf(nameof(_allowWallJumping))]
+        [SerializeField] private float _wallJumpMinDuration = 0.25f;
 
         private Rigidbody2D _rb;
         private float _lastJumpPressed;
@@ -36,6 +42,8 @@ namespace Metro
                                      && _entity.Collision.TimeLeftGrounded + _coyoteTimeThreshold > Time.time;
         private bool HasBufferedJump => _entity.Collision.IsGrounded 
                                         && _lastJumpPressed + _jumpBuffer > Time.time;
+
+        public float WallJumpMinDuration => _wallJumpMinDuration;
         
         public override void Initialize(BaseEntity entity)
         {
@@ -52,17 +60,9 @@ namespace Metro
             _entity.Collision.OnGrounded -= Event_OnGrounded;
         }
         
-        public void TryJump() // TRY JUMP is being attempted early when we hit space bar? maybe somehow being reset and unabalable on next space bar press?
+        public void TryJump()
         {
             _lastJumpPressed = Time.time;
-            
-            if (_allowWallJumping && !_entity.Collision.IsGrounded && _entity.Collision.IsTouchingWall)
-            {
-                float jumpDirection = _entity.Collision.IsWallLeft ? 1f : -1f;
-                _rb.velocity = Vector2.zero;
-                _rb.velocity += new Vector2(_wallJumpDistance * jumpDirection, _wallJumpHeight);
-                return;
-            }
             
             if (CanUseCoyote || HasBufferedJump || _jumpCount < _allowedJumps)
             {
@@ -76,6 +76,16 @@ namespace Metro
             else
             {
                 _jumpingThisFrame = false;
+            }
+        }
+        
+        public void TryWallJump()
+        {
+            if (_allowWallJumping && !_entity.Collision.IsGrounded && _entity.Collision.IsTouchingWall)
+            {
+                float jumpDirection = _entity.Collision.IsWallLeft ? 1f : -1f;
+                _rb.velocity = Vector2.zero;
+                _rb.velocity += new Vector2(_wallJumpDistance * jumpDirection, _wallJumpHeight);
             }
         }
         

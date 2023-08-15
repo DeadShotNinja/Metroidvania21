@@ -13,12 +13,9 @@ namespace Metro
     public abstract class BaseEntity : MonoBehaviour
     {
         [InfoBox("Physics")]
-        //[SerializeField] private EntityPhysics _physics;
         [SerializeField] private EntityCollision _collision;
         [SerializeField] private EntityGravity _gravity;
        
-        
-        //public EntityPhysics Physics => _physics;
         public EntityCollision Collision => _collision;
         public EntityGravity Gravity => _gravity;
         
@@ -39,7 +36,6 @@ namespace Metro
         {
             EntityRigidbody = GetComponent<Rigidbody2D>();
             
-            //_physics.Initialize(this);
             _collision.Initialize(this);
             _gravity.Initialize(this);
             EntityComponents = GetComponents<EntityComponent>();
@@ -60,17 +56,10 @@ namespace Metro
         
         protected virtual void Update()
         {
-            //_physics.LogicUpdate();
-            //_collision.LogicUpdate();
-            //_gravity.LogicUpdate();
             _collision.RunCollisionChecks();
             
             UpdateComponents();
             MovementStateMachine.CurrentState.LogicUpdate();
-            
-            
-            //_collision.LateLogicUpdate();
-            //_physics.LateLogicUpdate();
         }
 
         protected void FixedUpdate()
@@ -80,28 +69,6 @@ namespace Metro
             
             MovementStateMachine.CurrentState.PhysicsUpdate();
         }
-
-        // protected virtual void FixedUpdate()
-        // {
-        //     _physics.LogicUpdate();
-        //     _collision.LogicUpdate();
-        //     _gravity.LogicUpdate();
-        //     
-        //     MovementStateMachine.CurrentState.LogicUpdate();
-        //     UpdateComponents();
-        //     
-        //     _collision.LateLogicUpdate();
-        //     _physics.LateLogicUpdate();
-        // }
-
-        // protected void FixedUpdate()
-        // {
-        //     //_physics.LogicUpdate();
-        //     _gravity.LogicUpdate();
-        //     _collision.PhysicsUpdate();
-        //     _collision.LateLogicUpdate();
-        //     //_physics.LateLogicUpdate();
-        // }
 
         private void InitializeComponents()
         {

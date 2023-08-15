@@ -35,6 +35,7 @@ namespace Metro
         //public Bounds EntityBounds => _entityBounds;
         //public bool IsCollidingUp => _colUp;
         public bool IsGrounded => _colDown;
+        public bool IsTouchingWall => _colLeft || _colRight;
         public bool IsWallRight => _colRight;
         public bool IsWallLeft => _colLeft;
         //public LayerMask GroundLayer => _groundLayer;

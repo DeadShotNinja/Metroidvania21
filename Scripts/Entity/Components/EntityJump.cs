@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -17,6 +18,13 @@ namespace Metro
         [SerializeField] private float _coyoteTimeThreshold = 0.1f;
         [Tooltip("Duration for which a jump input is considered 'buffered' and valid.")]
         [SerializeField] private float _jumpBuffer = 0.1f;
+
+        [Header("Wall Jumping")]
+        [SerializeField] private bool _allowWallJumping = true;
+        [ShowIf(nameof(_allowWallJumping))]
+        [SerializeField] private float _wallJumpHeight = 30f;
+        [ShowIf(nameof(_allowWallJumping))]
+        [SerializeField] private float _wallJumpDistance = 30f;
 
         private Rigidbody2D _rb;
         private float _lastJumpPressed;
@@ -46,6 +54,14 @@ namespace Metro
         public void TryJump() // TRY JUMP is being attempted early when we hit space bar? maybe somehow being reset and unabalable on next space bar press?
         {
             _lastJumpPressed = Time.time;
+            
+            if (_allowWallJumping && !_entity.Collision.IsGrounded && _entity.Collision.IsTouchingWall)
+            {
+                float jumpDirection = _entity.Collision.IsWallLeft ? 1f : -1f;
+                _rb.velocity = Vector2.zero;
+                _rb.velocity += new Vector2(_wallJumpDistance * jumpDirection, _wallJumpHeight);
+                return;
+            }
             
             if (CanUseCoyote || HasBufferedJump || _jumpCount < _allowedJumps)
             {

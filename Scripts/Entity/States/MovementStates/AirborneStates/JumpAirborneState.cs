@@ -27,13 +27,6 @@ namespace Metro
 				_jump.JumpReleased();
 			}
 			
-			// if (!_jumpTriggered && (_entity.Collision.IsWallLeft && _entity.InputProvider.MoveInput.x < 0f
-			// 					|| _entity.Collision.IsWallRight && _entity.InputProvider.MoveInput.x > 0f))
-			// {
-			// 	_entity.MovementStateMachine.ChangeState(_entity.WallSlideAirborneState);
-			// 	return;
-			// }
-			
 			if (_entity.EntityRigidbody.velocity.y < 0f)
 			{
 				_entity.MovementStateMachine.ChangeState(_entity.FallAirborneState);

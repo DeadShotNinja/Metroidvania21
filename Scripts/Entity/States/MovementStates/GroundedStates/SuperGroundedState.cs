@@ -27,11 +27,6 @@ namespace Metro
 				_entity.MovementStateMachine.ChangeState(_entity.DashMovementState);
 				return;
 			}
-			else if (_entity.EntityRigidbody.velocity.y > 0f)
-			{
-				_entity.MovementStateMachine.ChangeState(_entity.JumpAirborneState);
-				return;
-			}
 			else if (_entity.EntityRigidbody.velocity.y < 0f)
 			{
 				_entity.MovementStateMachine.ChangeState(_entity.FallAirborneState);

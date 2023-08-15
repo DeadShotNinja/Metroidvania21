@@ -25,24 +25,14 @@ namespace Metro
         private Rigidbody2D _rb;
         private float _fallSpeed;
         private float _apexPoint;
-
-        //public bool IsGrounded { get; private set; }
         public bool EndedJumpEarly { get; set; } = true;
         public float ApexPoint => _apexPoint;
-
-        //public event Action OnGrounded;
         
         public void Initialize(BaseEntity entity)
         {
             _entity = entity;
             _rb = _entity.EntityRigidbody;
         }
-        
-        // public void LogicUpdate()
-        // {
-        //     CalculateJumpApex();
-        //     CalculateGravity();
-        // }
         
         public void CalculateJumpApex()
         {
@@ -58,11 +48,7 @@ namespace Metro
         
         public void ApplyGravity()
         {
-            if (_entity.Collision.IsGrounded)
-            {
-                //if (_rb.velocity.y < 0) _rb.velocity = new Vector2(_rb.velocity.x, 0f);
-            }
-            else
+            if (!_entity.Collision.IsGrounded)
             {
                 float fallSpeed = EndedJumpEarly && _rb.velocity.y > 0
                     ? _fallSpeed * _jumpEndEarlyGravityModifier

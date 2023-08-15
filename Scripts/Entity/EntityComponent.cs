@@ -7,7 +7,8 @@ namespace Metro
         None,
         HorizontalMove,
         Jump,
-        Dash
+        Dash,
+        WallSlide
     }
     
     /// <summary>

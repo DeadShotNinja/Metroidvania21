@@ -5,15 +5,17 @@ namespace Metro
     /// <summary>
     /// 
     /// </summary>
-    public class IdleMovementState : BaseMovementState
+    public class IdleGroundedState : SuperGroundedState
     {
-        public IdleMovementState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine)
+        public IdleGroundedState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine)
         {
         }
 
         public override void Enter()
         {
             base.Enter();
+            
+            _entity.StateText.SetText("IDLE");
         }
 
         public override void LogicUpdate()
@@ -22,9 +24,9 @@ namespace Metro
 
             if (_entity.InputProvider.MoveInput.x != 0f)
             {
-                _entity.MovementStateMachine.ChangeState(_entity.MoveMovementState);
+                _entity.MovementStateMachine.ChangeState(_entity.MoveGroundedState);
             }
-            else
+            else if (_horizontalMove != null)
             {
                 _horizontalMove.ApplyMovement(0f);
             }

@@ -42,6 +42,7 @@ namespace Metro
             base.Initialize(entity);
 
             _rb = _entity.EntityRigidbody;
+            Type = ComponentType.Jump;
             
             _entity.Collision.OnGrounded += Event_OnGrounded;
         }

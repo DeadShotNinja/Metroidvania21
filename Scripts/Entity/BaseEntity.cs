@@ -2,6 +2,7 @@ using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;
+using TMPro;
 
 namespace Metro
 {
@@ -15,6 +16,9 @@ namespace Metro
         [InfoBox("Physics")]
         [SerializeField] private EntityCollision _collision;
         [SerializeField] private EntityGravity _gravity;
+
+        [Header("Debugging")]
+        public TMP_Text StateText;
        
         public EntityCollision Collision => _collision;
         public EntityGravity Gravity => _gravity;
@@ -27,8 +31,15 @@ namespace Metro
 
         #region Movement States
 
-        public IdleMovementState IdleMovementState { get; private set; }
-        public MoveMovementState MoveMovementState { get; private set; }
+        // Airborne
+        public JumpAirborneState JumpAirborneState { get; private set; }
+        public FallAirborneState FallAirborneState { get; private set; }
+        public WallSlideAirborneState WallSlideAirborneState { get; private set; }
+        // Grounded
+        public IdleGroundedState IdleGroundedState { get; private set; }
+        public MoveGroundedState MoveGroundedState { get; private set; }
+        // Both
+        public DashMovementState DashMovementState { get; private set; }
 
         #endregion
 
@@ -43,10 +54,17 @@ namespace Metro
             
             MovementStateMachine = new StateMachine<BaseMovementState>();
             
-            IdleMovementState = new IdleMovementState(this, MovementStateMachine);
-            MoveMovementState = new MoveMovementState(this, MovementStateMachine);
+            // Airborne
+            JumpAirborneState = new JumpAirborneState(this, MovementStateMachine);
+            FallAirborneState = new FallAirborneState(this, MovementStateMachine);
+            WallSlideAirborneState = new WallSlideAirborneState(this, MovementStateMachine);
+            // Grounded
+            IdleGroundedState = new IdleGroundedState(this, MovementStateMachine);
+            MoveGroundedState = new MoveGroundedState(this, MovementStateMachine);
+            // Both
+            DashMovementState = new DashMovementState(this, MovementStateMachine);
             
-            MovementStateMachine.Initialize(IdleMovementState);
+            MovementStateMachine.Initialize(IdleGroundedState);
         }
         
         protected virtual void Start()

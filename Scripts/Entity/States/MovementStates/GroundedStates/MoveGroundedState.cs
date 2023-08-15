@@ -6,17 +6,19 @@ namespace Metro
     /// <summary>
     /// 
     /// </summary>
-    public class MoveMovementState : BaseMovementState
+    public class MoveGroundedState : SuperGroundedState
     {
         private bool _isMoving = false;
         
-        public MoveMovementState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine)
+        public MoveGroundedState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine)
         {
         }
 
         public override void Enter()
         {
             base.Enter();
+            
+            _entity.StateText.SetText("MOVING");
         }
 
         public override void LogicUpdate()
@@ -26,7 +28,7 @@ namespace Metro
             if (_horizontalMove == null || _entity.InputProvider.MoveInput.x == 0f)
             {
                 _isMoving = false;
-                _entity.MovementStateMachine.ChangeState(_entity.IdleMovementState);
+                _entity.MovementStateMachine.ChangeState(_entity.IdleGroundedState);
                 return;
             }
             

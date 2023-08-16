@@ -19,6 +19,7 @@ namespace Metro
 			_wallJumpTriggered = true;
 			_stateLockTimer = _jump.WallJumpMinDuration + Time.time;
 			_checkBuffer = Time.time + 0.1f;
+			//_entity.Gravity.GravityActive = false;
 
 			if (_entity.Collision.IsWallLeft) _wallDirection = -1f;
 			else if (_entity.Collision.IsWallRight) _wallDirection = 1f;
@@ -44,7 +45,14 @@ namespace Metro
 				_wallJumpTriggered = false;
 			}
 		}
-		
+
+		public override void Exit()
+		{
+			base.Exit();
+
+			//_entity.Gravity.GravityActive = true;
+		}
+
 		private bool ShoulSwitchToFall()
 		{
 			if (_wallJumpTriggered)

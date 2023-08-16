@@ -25,6 +25,8 @@ namespace Metro
         private Rigidbody2D _rb;
         private float _fallSpeed;
         private float _apexPoint;
+
+        public bool GravityActive { get; set; } = true;
         public bool EndedJumpEarly { get; set; } = true;
         public float ApexPoint => _apexPoint;
         
@@ -48,14 +50,14 @@ namespace Metro
         
         public void ApplyGravity()
         {
-            if (!_entity.Collision.IsGrounded)
+            if (GravityActive && !_entity.Collision.IsGrounded) // && !_entity.Collision.IsTouchingWall)
             {
                 float fallSpeed = EndedJumpEarly && _rb.velocity.y > 0
                     ? _fallSpeed * _jumpEndEarlyGravityModifier
                     : _fallSpeed;
-
+            
                 _rb.velocity = new Vector2(_rb.velocity.x, _rb.velocity.y - fallSpeed * Time.deltaTime);
-        
+            
                 if (_rb.velocity.y < _fallClamp) _rb.velocity = new Vector2(_rb.velocity.x, _fallClamp);
             }
         }

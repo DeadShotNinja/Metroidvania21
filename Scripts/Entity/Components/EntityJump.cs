@@ -75,6 +75,7 @@ namespace Metro
         
         public void PerformWallJump()
         {
+            _entity.Gravity.EndedJumpEarly = false;
             float jumpDirection = _entity.Collision.IsWallLeft ? 1f : -1f;
             _rb.velocity = new Vector2(_wallJumpDistance * jumpDirection, _wallJumpHeight);
         }

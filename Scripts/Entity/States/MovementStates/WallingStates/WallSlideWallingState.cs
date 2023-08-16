@@ -19,29 +19,29 @@ namespace Metro
 		{
 			base.LogicUpdate();
 
-			bool notPressingTowardsWall = (_entity.Collision.IsWallRight && _entity.InputProvider.MoveInput.x <= 0f) 
-			                              || (_entity.Collision.IsWallLeft && _entity.InputProvider.MoveInput.x >= 0f);
-			bool notTouchingWall = !_entity.Collision.IsTouchingWall;
-			
-			if (_entity.Collision.IsGrounded)
-			{
-				_entity.MovementStateMachine.ChangeState(_entity.IdleGroundedState);
-			}
-			else if (notPressingTowardsWall || notTouchingWall)
-			{
-				_entity.MovementStateMachine.ChangeState(_entity.FallAirborneState);
-			}
-			else if (_entity.InputProvider.JumpInput.Pressed)
-			{
-				_entity.MovementStateMachine.ChangeState(_entity.WallJumpWallingState);
-			}
+			// bool notPressingTowardsWall = (_entity.Collision.IsWallRight && _entity.InputProvider.MoveInput.x <= 0f) 
+			//                               || (_entity.Collision.IsWallLeft && _entity.InputProvider.MoveInput.x >= 0f);
+			// bool notTouchingWall = !_entity.Collision.IsTouchingWall;
+			//
+			// if (_entity.Collision.IsGrounded)
+			// {
+			// 	_entity.MovementStateMachine.ChangeState(_entity.IdleGroundedState);
+			// }
+			// else if (notPressingTowardsWall || notTouchingWall)
+			// {
+			// 	_entity.MovementStateMachine.ChangeState(_entity.FallAirborneState);
+			// }
+			// else if (_entity.InputProvider.JumpInput.Pressed)
+			// {
+			// 	_entity.MovementStateMachine.ChangeState(_entity.WallJumpWallingState);
+			// }
 		}
 
 		public override void PhysicsUpdate()
 		{
 			base.PhysicsUpdate();
 			
-			if (_wallSlide != null) _wallSlide.ApplySlide();
+			// if (_wallSlide != null) _wallSlide.ApplySlide();
 		}
 
 		public override void Exit()

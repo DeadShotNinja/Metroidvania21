@@ -4,11 +4,9 @@ namespace Metro
 {
 	public class JumpAirborneState : SuperAirborneState
 	{
-		private bool _jumpTriggered = false;
+		private bool _jumpTriggered;
 		
-		public JumpAirborneState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine)
-		{
-		}
+		public JumpAirborneState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine) { }
 
 		public override void Enter()
 		{
@@ -22,13 +20,14 @@ namespace Metro
 		{
 			base.LogicUpdate();
 			
-			if (_jump != null && _entity.InputProvider.JumpInput.Released)
+			if (_entity.InputProvider.JumpInput.Released)
 			{
 				_jump.JumpReleased();
 			}
 			
-			if (_entity.EntityRigidbody.velocity.y < 0f)
+			if (ShouldSwitchToFall())
 			{
+				Debug.Log("Switching to fall");
 				_entity.MovementStateMachine.ChangeState(_entity.FallAirborneState);
 			}
 		}
@@ -39,14 +38,18 @@ namespace Metro
 			
 			if (_jumpTriggered)
 			{
-				_jump.TryJump();
+				//_jump.TryJump();
+				_jump.PerformJump();
 				_jumpTriggered = false;
 			}
 		}
 
-		public override void Exit()
+		private bool ShouldSwitchToFall()
 		{
-			base.Exit();
+			if (_jumpTriggered)
+				return false;
+
+			return _entity.EntityRigidbody.velocity.y < 0f;
 		}
 	}
 }

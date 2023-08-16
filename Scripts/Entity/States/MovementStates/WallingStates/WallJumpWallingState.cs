@@ -17,36 +17,36 @@ namespace Metro
 			base.Enter();
 
 			_entity.StateText.SetText("WALL-JUMPING");
-			_wallJumpTriggered = true;
-			_bufferTimer = _stateEvalBuffer + Time.time;
-			if (_jump != null) _stateLockTimer = _jump.WallJumpMinDuration + Time.time;
+			// _wallJumpTriggered = true;
+			// _bufferTimer = _stateEvalBuffer + Time.time;
+			// if (_jump != null) _stateLockTimer = _jump.WallJumpMinDuration + Time.time;
 		}
 
 		public override void LogicUpdate()
 		{
 			base.LogicUpdate();
 			
-			if (_bufferTimer > Time.time) return;
-			
-			if (_entity.Collision.IsGrounded)
-			{
-				_entity.MovementStateMachine.ChangeState(_entity.IdleGroundedState);
-			}
-			else if (_entity.EntityRigidbody.velocity.x == 0f || _stateLockTimer < Time.time)
-			{
-				_entity.MovementStateMachine.ChangeState(_entity.FallAirborneState);
-			}
+			// if (_bufferTimer > Time.time) return;
+			//
+			// if (_entity.Collision.IsGrounded)
+			// {
+			// 	_entity.MovementStateMachine.ChangeState(_entity.IdleGroundedState);
+			// }
+			// else if (_entity.EntityRigidbody.velocity.x == 0f || _stateLockTimer < Time.time)
+			// {
+			// 	_entity.MovementStateMachine.ChangeState(_entity.FallAirborneState);
+			// }
 		}
 
 		public override void PhysicsUpdate()
 		{
 			base.PhysicsUpdate();
 			
-			if (_wallJumpTriggered && _jump != null)
-			{
-				_jump.TryWallJump();
-				_wallJumpTriggered = false;
-			}
+			// if (_wallJumpTriggered && _jump != null)
+			// {
+			// 	_jump.TryWallJump();
+			// 	_wallJumpTriggered = false;
+			// }
 		}
 
 		public override void Exit()

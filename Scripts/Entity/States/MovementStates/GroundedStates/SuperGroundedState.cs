@@ -4,44 +4,50 @@ namespace Metro
 {
 	public abstract class SuperGroundedState : BaseMovementState
 	{
-		protected SuperGroundedState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine)
-		{
-		}
-
-		public override void Enter()
-		{
-			base.Enter();
-		}
+		protected bool _colLeft, _colRight;
+		
+		protected SuperGroundedState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine) { }
 
 		public override void LogicUpdate()
 		{
 			base.LogicUpdate();
 			
-			if (_jump != null && _entity.InputProvider.JumpInput.Pressed)
+			_colRight = _entity.Collision.IsWallRight || _entity.Collision.IsGroundRight;
+			_colLeft = _entity.Collision.IsWallLeft || _entity.Collision.IsGroundLeft;
+			
+			if (ShouldSwitchToJump())
 			{
+				Debug.Log("Switching to jump");
 				_entity.MovementStateMachine.ChangeState(_entity.JumpAirborneState);
 				return;
 			}
-			else if (_horizontalMove != null && _entity.InputProvider.DashInput.Pressed)
-			{
-				_entity.MovementStateMachine.ChangeState(_entity.DashMovementState);
-				return;
-			}
-			else if (_entity.EntityRigidbody.velocity.y < 0f)
+			// else if (_horizontalMove != null && _entity.InputProvider.DashInput.Pressed)
+			// {
+			// 	_entity.MovementStateMachine.ChangeState(_entity.DashMovementState);
+			// 	return;
+			// }
+			if (ShouldSwitchToFall())
 			{
 				_entity.MovementStateMachine.ChangeState(_entity.FallAirborneState);
 				return;
 			}
 		}
-
-		public override void PhysicsUpdate()
+		
+		private bool ShouldSwitchToJump()
 		{
-			base.PhysicsUpdate();
+			// Can do a celling collision check here too.
+			
+			
+			
+			return _entity.InputProvider.JumpInput.Pressed;
 		}
-
-		public override void Exit()
+		
+		private bool ShouldSwitchToFall()
 		{
-			base.Exit();
+			if (_entity.Collision.IsGrounded)
+				return false;
+			
+			return _entity.EntityRigidbody.velocity.y < 0f;
 		}
 	}
 }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Metro
@@ -24,25 +23,26 @@ namespace Metro
         [SerializeField] private float _detectionRayLength = 0.1f;
         [Tooltip("Prevents side detectors from hitting the ground.")]
         [SerializeField] [Range(0.1f, 0.3f)] private float _rayBuffer = 0.1f;
-        //[SerializeField, ReadOnly] private bool _isGrounded = false;
-        [SerializeField, ReadOnly] private bool _colRight, _colDown, _colLeft; // _colUp 
+        [Tooltip("Checking this true will show the rays in play mode. (Have to select the GameObject)")]
+        [SerializeField] private bool _showDebugRays = false;
         
         private BaseEntity _entity;
-        private bool _landingThisFrame;
         private RayRange _raysUp, _raysRight, _raysDown, _raysLeft;
-        private bool _wasGrounded = false;
-
-        //public Bounds EntityBounds => _entityBounds;
-        //public bool IsCollidingUp => _colUp;
-        public bool IsGrounded => _colDown;
-        public bool IsTouchingWall => _colLeft || _colRight;
-        public bool IsWallRight => _colRight;
-        public bool IsWallLeft => _colLeft;
-        //public LayerMask GroundLayer => _groundLayer;
-        //public bool IsGrounded => _isGrounded;
+        private bool _groundColRight, _groundColLeft, _groundColDown;
+        private bool _wallColRight, _wallColLeft, _wallColDown;
+        private bool _wasGrounded;
+        
+        public bool IsGrounded => _groundColDown || _wallColDown;
+        public bool IsGroundRight => _groundColRight;
+        public bool IsGroundLeft => _groundColLeft;
+        public bool IsTouchingWall => _wallColLeft || _wallColRight;
+        public bool IsWallRight => _wallColRight;
+        public bool IsWallLeft => _wallColLeft;
         
         public float TimeLeftGrounded { get; set; }
         public bool IsCoyoteUsable { get; set; }
+        public bool GroundedThisFrame { get; private set; }
+        public bool LeavingGroundedThisFrame { get; private set; }
 
         public event Action OnGrounded;
         
@@ -51,48 +51,39 @@ namespace Metro
             _entity = entity;
         }
         
-        // public void LogicUpdate()
-        // {
-        //     RunCollisionChecks();
-        // }
-
-        // public void PhysicsUpdate()
-        // {
-        //     RunCollisionChecks();
-        //     UpwardsCollisionChecks();
-        // }
-        
-        // public void LateLogicUpdate()
-        // {
-        //     UpwardsCollisionChecks();
-        // }
-        
         public void RunCollisionChecks()
         {
              CalculateRayRanged(_entity.transform.position);
         
-             _landingThisFrame = false; 
-             bool groundedCheck = RunDetection(_raysDown, _groundLayer);
-             bool wallGroundCheck = RunDetection(_raysDown, _wallLayer);
-             if (_colDown && !groundedCheck) TimeLeftGrounded = Time.time; 
-             else if (!_colDown && groundedCheck)
+             GroundedThisFrame = false;
+             LeavingGroundedThisFrame = false;
+             bool groundDownCheck = RunDetection(_raysDown, _groundLayer);
+             bool wallDownCheck = RunDetection(_raysDown, _wallLayer);
+             if (IsGrounded && (!groundDownCheck || !wallDownCheck))
+             {
+                 TimeLeftGrounded = Time.time;
+                 LeavingGroundedThisFrame = true;
+             }
+             else if (!IsGrounded && (groundDownCheck || wallDownCheck))
              {
                  IsCoyoteUsable = true;
-                 _landingThisFrame = true;
+                 GroundedThisFrame = true;
              }
 
-             _colDown = groundedCheck || wallGroundCheck;
-             //_colUp = RunDetection(_raysUp);
-             _colLeft = RunDetection(_raysLeft, _wallLayer);
-             _colRight = RunDetection(_raysRight, _wallLayer);
+             _groundColDown = groundDownCheck;
+             _groundColLeft = RunDetection(_raysLeft, _groundLayer);
+             _groundColRight = RunDetection(_raysRight, _groundLayer);
 
-             //_isGrounded = _colDown;
-             if (!_wasGrounded && _colDown)
+             _wallColDown = wallDownCheck;
+             _wallColLeft = RunDetection(_raysLeft, _wallLayer);
+             _wallColRight = RunDetection(_raysRight, _wallLayer);
+
+             if (!_wasGrounded && _groundColDown)
              {
                  _wasGrounded = true;
                  OnGrounded?.Invoke();
              }
-             else if (_wasGrounded && !_colDown) _wasGrounded = false;
+             else if (_wasGrounded && !_groundColDown) _wasGrounded = false;
 
              return;
              bool RunDetection(RayRange range, LayerMask mask)
@@ -101,14 +92,6 @@ namespace Metro
                      Physics2D.Raycast(point, range.Dir, _detectionRayLength, mask));
              }
         }
-        
-        // private void UpwardsCollisionChecks()
-        // {
-        //     if (IsCollidingUp)
-        //     {
-        //         if (_entity.Physics.CurrentVerticalSpeed > 0) _entity.Physics.CurrentVerticalSpeed = 0;
-        //     }
-        // }
         
         private void CalculateRayRanged(Vector3 entityPosition)
         {
@@ -134,7 +117,7 @@ namespace Metro
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireCube(entityPosition + _entityBounds.center, _entityBounds.size);
         
-            if (!Application.isPlaying) {
+            if (_showDebugRays || !Application.isPlaying) {
                 CalculateRayRanged(entityPosition);
                 Gizmos.color = Color.blue;
                 foreach (RayRange range in new List<RayRange> { _raysUp, _raysRight, _raysDown, _raysLeft }) {

@@ -1,18 +1,11 @@
-using System;
-using UnityEngine;
-
 namespace Metro
 {
     /// <summary>
-    /// 
+    /// Moving state while on the ground.
     /// </summary>
     public class MoveGroundedState : SuperGroundedState
     {
-        private bool _isMoving = false;
-        
-        public MoveGroundedState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine)
-        {
-        }
+        public MoveGroundedState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine) { }
 
         public override void Enter()
         {
@@ -25,16 +18,10 @@ namespace Metro
         {
             base.LogicUpdate();
             
-            if (_horizontalMove == null || _entity.InputProvider.MoveInput.x == 0f)
+            if (ShouldSwitchToIdle())
             {
-                _isMoving = false;
                 _entity.MovementStateMachine.ChangeState(_entity.IdleGroundedState);
                 return;
-            }
-            
-            if (Mathf.Abs(_entity.InputProvider.MoveInput.x) > 0f)
-            {
-                _isMoving = true;
             }
         }
         
@@ -42,15 +29,18 @@ namespace Metro
         {
             base.PhysicsUpdate();
 
-            if (_isMoving)
-            {
-                _horizontalMove.ApplyMovement(_entity.InputProvider.MoveInput.x);
-            }
+            _horizontalMove.ApplyMovement(_entity.InputProvider.MoveInput.x);
         }
-
-        public override void Exit()
+        
+        private bool ShouldSwitchToIdle()
         {
-            base.Exit();
+            if (_colLeft && _entity.InputProvider.MoveInput.x < 0f)
+                return true;
+            
+            if (_colRight && _entity.InputProvider.MoveInput.x > 0f)
+                return true;
+
+            return _entity.InputProvider.MoveInput.x == 0f;
         }
     }
 }

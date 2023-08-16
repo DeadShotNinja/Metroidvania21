@@ -1,15 +1,11 @@
-using UnityEngine;
-
 namespace Metro
 {
     /// <summary>
-    /// 
+    /// Idle state for when the entity is not moving.
     /// </summary>
     public class IdleGroundedState : SuperGroundedState
     {
-        public IdleGroundedState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine)
-        {
-        }
+        public IdleGroundedState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine) { }
 
         public override void Enter()
         {
@@ -22,19 +18,29 @@ namespace Metro
         {
             base.LogicUpdate();
 
-            if (_entity.InputProvider.MoveInput.x != 0f)
+            if (ShouldSwitchToMove())
             {
                 _entity.MovementStateMachine.ChangeState(_entity.MoveGroundedState);
-            }
-            else if (_horizontalMove != null)
-            {
-                _horizontalMove.ApplyMovement(0f);
+                return;
             }
         }
 
-        public override void Exit()
+        public override void PhysicsUpdate()
         {
-            base.Exit();
+            base.PhysicsUpdate();
+            
+            _horizontalMove.ApplyMovement(0f);
+        }
+        
+        private bool ShouldSwitchToMove()
+        {
+            if (!_colLeft && _entity.InputProvider.MoveInput.x < 0f)
+                return true;
+
+            if (!_colRight && _entity.InputProvider.MoveInput.x > 0f)
+                return true;
+
+            return false;
         }
     }
 }

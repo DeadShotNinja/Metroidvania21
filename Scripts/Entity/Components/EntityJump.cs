@@ -63,15 +63,23 @@ namespace Metro
         public void TryJump()
         {
             _lastJumpPressed = Time.time;
-            
-            if (CanUseCoyote || HasBufferedJump || _jumpCount < _allowedJumps)
+
+            if (_entity.Collision.GroundedThisFrame)
+            {
+                PerformJump();
+            }
+            if ((CanUseCoyote || HasBufferedJump) && _jumpCount == 0)
+            {
+                PerformJump();
+            }
+            else if (!CanUseCoyote && !HasBufferedJump && _jumpCount == 0 && _allowedJumps > 1)
             {
                 _jumpCount++;
-                _rb.velocity = new Vector2(_rb.velocity.x, _jumpSpeed);
-                _entity.Gravity.EndedJumpEarly = false;
-                _entity.Collision.IsCoyoteUsable = false;
-                _entity.Collision.TimeLeftGrounded = float.MinValue;
-                _jumpingThisFrame = true;
+                PerformJump();
+            }
+            else if (_jumpCount > 0 && _jumpCount < _allowedJumps)
+            {
+                PerformJump();
             }
             else
             {
@@ -79,13 +87,22 @@ namespace Metro
             }
         }
         
+        public void PerformJump()
+        {
+            _jumpCount++;
+            _rb.velocity = new Vector2(_rb.velocity.x, _jumpSpeed);
+            _entity.Gravity.EndedJumpEarly = false;
+            _entity.Collision.IsCoyoteUsable = false;
+            _entity.Collision.TimeLeftGrounded = float.MinValue;
+            _jumpingThisFrame = true;
+        }
+        
         public void TryWallJump()
         {
             if (_allowWallJumping && !_entity.Collision.IsGrounded && _entity.Collision.IsTouchingWall)
             {
                 float jumpDirection = _entity.Collision.IsWallLeft ? 1f : -1f;
-                _rb.velocity = Vector2.zero;
-                _rb.velocity += new Vector2(_wallJumpDistance * jumpDirection, _wallJumpHeight);
+                _rb.velocity = new Vector2(_wallJumpDistance * jumpDirection, _wallJumpHeight);
             }
         }
         

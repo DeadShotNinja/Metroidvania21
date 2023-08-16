@@ -4,9 +4,9 @@ namespace Metro
 {
 	public class WallSlideWallingState : SuperWallingState
 	{
-		public WallSlideWallingState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine)
-		{
-		}
+		private bool _colUp;
+		
+		public WallSlideWallingState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine) { }
 
 		public override void Enter()
 		{
@@ -18,35 +18,55 @@ namespace Metro
 		public override void LogicUpdate()
 		{
 			base.LogicUpdate();
-
-			// bool notPressingTowardsWall = (_entity.Collision.IsWallRight && _entity.InputProvider.MoveInput.x <= 0f) 
-			//                               || (_entity.Collision.IsWallLeft && _entity.InputProvider.MoveInput.x >= 0f);
-			// bool notTouchingWall = !_entity.Collision.IsTouchingWall;
-			//
-			// if (_entity.Collision.IsGrounded)
-			// {
-			// 	_entity.MovementStateMachine.ChangeState(_entity.IdleGroundedState);
-			// }
-			// else if (notPressingTowardsWall || notTouchingWall)
-			// {
-			// 	_entity.MovementStateMachine.ChangeState(_entity.FallAirborneState);
-			// }
-			// else if (_entity.InputProvider.JumpInput.Pressed)
-			// {
-			// 	_entity.MovementStateMachine.ChangeState(_entity.WallJumpWallingState);
-			// }
+			
+			_colUp = _entity.Collision.IsWallUp || _entity.Collision.IsGroundUp;
+			
+			if (ShouldSwitchToFall())
+			{
+				_entity.MovementStateMachine.ChangeState(_entity.FallAirborneState);
+				return;
+			}
+			
+			if (ShouldSwitchToWallJump())
+			{
+				_entity.MovementStateMachine.ChangeState(_entity.WallJumpWallingState);
+				return;
+			}
 		}
 
 		public override void PhysicsUpdate()
 		{
 			base.PhysicsUpdate();
 			
-			// if (_wallSlide != null) _wallSlide.ApplySlide();
+			_wallSlide.ApplySlide();
 		}
-
-		public override void Exit()
+		
+		private bool ShouldSwitchToFall()
 		{
-			base.Exit();
+			if (_entity.Collision.IsWallRight && _entity.InputProvider.MoveInput.x <= 0f)
+				return true;
+
+			if (_entity.Collision.IsWallLeft && _entity.InputProvider.MoveInput.x >= 0f)
+				return true;
+
+			return !_entity.Collision.IsTouchingWall;
+		}
+		
+		private bool ShouldSwitchToWallJump()
+		{
+			if (!_jump.AllowWalljumping)
+				return false;
+			
+			if (!_entity.InputProvider.JumpInput.Pressed)
+				return false;
+
+			if (_colUp)
+				return false;
+
+			if (_entity.Collision.IsGrounded)
+				return false;
+			
+			return _entity.Collision.IsTouchingWall || _entity.Collision.OnWallThisFrame;
 		}
 	}
 }

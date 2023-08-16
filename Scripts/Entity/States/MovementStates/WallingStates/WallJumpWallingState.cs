@@ -4,54 +4,56 @@ namespace Metro
 {
 	public class WallJumpWallingState : SuperWallingState
 	{
-		private bool _wallJumpTriggered = false;
+		private bool _wallJumpTriggered;
 		private float _stateLockTimer;
-		private float _bufferTimer;
+		private float _wallDirection;
+		private float _checkBuffer;
 		
-		public WallJumpWallingState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine)
-		{
-		}
+		public WallJumpWallingState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine) { }
 
 		public override void Enter()
 		{
 			base.Enter();
 
 			_entity.StateText.SetText("WALL-JUMPING");
-			// _wallJumpTriggered = true;
-			// _bufferTimer = _stateEvalBuffer + Time.time;
-			// if (_jump != null) _stateLockTimer = _jump.WallJumpMinDuration + Time.time;
+			_wallJumpTriggered = true;
+			_stateLockTimer = _jump.WallJumpMinDuration + Time.time;
+			_checkBuffer = Time.time + 0.1f;
+
+			if (_entity.Collision.IsWallLeft) _wallDirection = -1f;
+			else if (_entity.Collision.IsWallRight) _wallDirection = 1f;
 		}
 
 		public override void LogicUpdate()
 		{
 			base.LogicUpdate();
 			
-			// if (_bufferTimer > Time.time) return;
-			//
-			// if (_entity.Collision.IsGrounded)
-			// {
-			// 	_entity.MovementStateMachine.ChangeState(_entity.IdleGroundedState);
-			// }
-			// else if (_entity.EntityRigidbody.velocity.x == 0f || _stateLockTimer < Time.time)
-			// {
-			// 	_entity.MovementStateMachine.ChangeState(_entity.FallAirborneState);
-			// }
+			if (ShoulSwitchToFall())
+			{
+				_entity.MovementStateMachine.ChangeState(_entity.FallAirborneState);
+			}
 		}
 
 		public override void PhysicsUpdate()
 		{
 			base.PhysicsUpdate();
 			
-			// if (_wallJumpTriggered && _jump != null)
-			// {
-			// 	_jump.TryWallJump();
-			// 	_wallJumpTriggered = false;
-			// }
+			if (_wallJumpTriggered)
+			{
+				_jump.PerformWallJump();
+				_wallJumpTriggered = false;
+			}
 		}
-
-		public override void Exit()
+		
+		private bool ShoulSwitchToFall()
 		{
-			base.Exit();
+			if (_wallJumpTriggered)
+				return false;
+
+			if (_checkBuffer < Time.time && _entity.EntityRigidbody.velocity.x == 0f)
+				return true;
+
+			return _stateLockTimer <= Time.time;
 		}
 	}
 }

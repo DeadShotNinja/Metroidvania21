@@ -10,5 +10,21 @@ namespace Metro
 			
 			_entity.StateText.SetText("FALLING");
 		}
+
+		public override void LogicUpdate()
+		{
+			base.LogicUpdate();
+			
+			if (ShouldSwitchToIdle())
+			{
+				_entity.MovementStateMachine.ChangeState(_entity.IdleGroundedState);
+				return;
+			}
+		}
+		
+		private bool ShouldSwitchToIdle()
+		{
+			return _entity.Collision.IsGrounded;
+		}
 	}
 }

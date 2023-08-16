@@ -33,17 +33,19 @@ namespace Metro
         [SerializeField] private float _wallJumpMinDuration = 0.25f;
 
         private Rigidbody2D _rb;
-        private float _lastJumpPressed;
-        private bool _jumpingThisFrame;
-        private int _jumpCount = 0;
 
-        private bool CanUseCoyote => _entity.Collision.IsCoyoteUsable 
+        public bool CanUseCoyote => _entity.Collision.IsCoyoteUsable 
                                      && !_entity.Collision.IsGrounded 
                                      && _entity.Collision.TimeLeftGrounded + _coyoteTimeThreshold > Time.time;
-        private bool HasBufferedJump => _entity.Collision.IsGrounded 
-                                        && _lastJumpPressed + _jumpBuffer > Time.time;
+        public bool HasBufferedJump => _entity.Collision.IsGrounded 
+                                        && LastJumpPressed + _jumpBuffer > Time.time;
 
         public float WallJumpMinDuration => _wallJumpMinDuration;
+        public bool AllowWalljumping => _allowWallJumping;
+        public int AllowedJumps => _allowedJumps;
+        
+        public int JumpCount { get; set; } = 0;
+        public float LastJumpPressed { get; set; }
         
         public override void Initialize(BaseEntity entity)
         {
@@ -60,50 +62,21 @@ namespace Metro
             _entity.Collision.OnGrounded -= Event_OnGrounded;
         }
         
-        public void TryJump()
-        {
-            _lastJumpPressed = Time.time;
-
-            if (_entity.Collision.GroundedThisFrame)
-            {
-                PerformJump();
-            }
-            if ((CanUseCoyote || HasBufferedJump) && _jumpCount == 0)
-            {
-                PerformJump();
-            }
-            else if (!CanUseCoyote && !HasBufferedJump && _jumpCount == 0 && _allowedJumps > 1)
-            {
-                _jumpCount++;
-                PerformJump();
-            }
-            else if (_jumpCount > 0 && _jumpCount < _allowedJumps)
-            {
-                PerformJump();
-            }
-            else
-            {
-                _jumpingThisFrame = false;
-            }
-        }
-        
         public void PerformJump()
         {
-            _jumpCount++;
+            //LastJumpPressed = Time.time;
+            
+            JumpCount++;
             _rb.velocity = new Vector2(_rb.velocity.x, _jumpSpeed);
             _entity.Gravity.EndedJumpEarly = false;
             _entity.Collision.IsCoyoteUsable = false;
             _entity.Collision.TimeLeftGrounded = float.MinValue;
-            _jumpingThisFrame = true;
         }
         
-        public void TryWallJump()
+        public void PerformWallJump()
         {
-            if (_allowWallJumping && !_entity.Collision.IsGrounded && _entity.Collision.IsTouchingWall)
-            {
-                float jumpDirection = _entity.Collision.IsWallLeft ? 1f : -1f;
-                _rb.velocity = new Vector2(_wallJumpDistance * jumpDirection, _wallJumpHeight);
-            }
+            float jumpDirection = _entity.Collision.IsWallLeft ? 1f : -1f;
+            _rb.velocity = new Vector2(_wallJumpDistance * jumpDirection, _wallJumpHeight);
         }
         
         public void JumpReleased()
@@ -116,7 +89,7 @@ namespace Metro
         
         private void Event_OnGrounded()
         {
-            _jumpCount = 0;
+            JumpCount = 0;
         }
     }
 }

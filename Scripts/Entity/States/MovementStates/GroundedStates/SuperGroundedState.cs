@@ -4,7 +4,7 @@ namespace Metro
 {
 	public abstract class SuperGroundedState : BaseMovementState
 	{
-		protected bool _colLeft, _colRight;
+		protected bool _colLeft, _colRight, _colUp;
 		
 		protected SuperGroundedState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine) { }
 
@@ -14,32 +14,48 @@ namespace Metro
 			
 			_colRight = _entity.Collision.IsWallRight || _entity.Collision.IsGroundRight;
 			_colLeft = _entity.Collision.IsWallLeft || _entity.Collision.IsGroundLeft;
+			_colUp = _entity.Collision.IsWallUp || _entity.Collision.IsGroundUp;
 			
-			if (ShouldSwitchToJump())
-			{
-				Debug.Log("Switching to jump");
-				_entity.MovementStateMachine.ChangeState(_entity.JumpAirborneState);
-				return;
-			}
-			// else if (_horizontalMove != null && _entity.InputProvider.DashInput.Pressed)
-			// {
-			// 	_entity.MovementStateMachine.ChangeState(_entity.DashMovementState);
-			// 	return;
-			// }
 			if (ShouldSwitchToFall())
 			{
 				_entity.MovementStateMachine.ChangeState(_entity.FallAirborneState);
+				return;
+			}
+			
+			if (ShouldSwitchToJump())
+			{
+				_entity.MovementStateMachine.ChangeState(_entity.JumpAirborneState);
+				return;
+			}
+			
+			if (ShouldSwitchToDash())
+			{
+				_entity.MovementStateMachine.ChangeState(_entity.DashMovementState);
 				return;
 			}
 		}
 		
 		private bool ShouldSwitchToJump()
 		{
-			// Can do a celling collision check here too.
+			if (!_entity.InputProvider.JumpInput.Pressed)
+				return false;
+			_jump.LastJumpPressed = Time.time;
+
+			if (_colUp)
+				return false;
+
+			if (_entity.Collision.GroundedThisFrame)
+				return true;
 			
+			return _jump.HasBufferedJump;
+		}
+		
+		private bool ShouldSwitchToDash()
+		{
+			if (_horizontalMove.DashNeedsReset)
+				return false;
 			
-			
-			return _entity.InputProvider.JumpInput.Pressed;
+			return _entity.InputProvider.DashInput.Pressed;
 		}
 		
 		private bool ShouldSwitchToFall()

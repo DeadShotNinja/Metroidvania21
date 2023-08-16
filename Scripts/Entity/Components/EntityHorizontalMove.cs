@@ -33,7 +33,7 @@ namespace Metro
         private bool _dashNeedsReset = false;
         
         public float DashDuration => _dashDuration;
-        public bool DashNeedsRest => _dashNeedsReset;
+        public bool DashNeedsReset => _dashNeedsReset;
         
         public override void Initialize(BaseEntity entity)
         {

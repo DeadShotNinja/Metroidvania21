@@ -27,7 +27,6 @@ namespace Metro
 			
 			if (ShouldSwitchToFall())
 			{
-				Debug.Log("Switching to fall");
 				_entity.MovementStateMachine.ChangeState(_entity.FallAirborneState);
 			}
 		}
@@ -38,7 +37,6 @@ namespace Metro
 			
 			if (_jumpTriggered)
 			{
-				//_jump.TryJump();
 				_jump.PerformJump();
 				_jumpTriggered = false;
 			}

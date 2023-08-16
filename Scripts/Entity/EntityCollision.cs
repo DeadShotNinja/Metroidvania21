@@ -28,21 +28,24 @@ namespace Metro
         
         private BaseEntity _entity;
         private RayRange _raysUp, _raysRight, _raysDown, _raysLeft;
-        private bool _groundColRight, _groundColLeft, _groundColDown;
-        private bool _wallColRight, _wallColLeft, _wallColDown;
+        private bool _groundColRight, _groundColLeft, _groundColDown, _groundColUp;
+        private bool _wallColRight, _wallColLeft, _wallColDown, _wallColUp;
         private bool _wasGrounded;
         
         public bool IsGrounded => _groundColDown || _wallColDown;
         public bool IsGroundRight => _groundColRight;
         public bool IsGroundLeft => _groundColLeft;
+        public bool IsGroundUp => _groundColUp;
         public bool IsTouchingWall => _wallColLeft || _wallColRight;
         public bool IsWallRight => _wallColRight;
         public bool IsWallLeft => _wallColLeft;
+        public bool IsWallUp => _wallColUp;
         
         public float TimeLeftGrounded { get; set; }
         public bool IsCoyoteUsable { get; set; }
         public bool GroundedThisFrame { get; private set; }
         public bool LeavingGroundedThisFrame { get; private set; }
+        public bool OnWallThisFrame { get; private set; }
 
         public event Action OnGrounded;
         
@@ -69,14 +72,20 @@ namespace Metro
                  IsCoyoteUsable = true;
                  GroundedThisFrame = true;
              }
+             
+             OnWallThisFrame = false;
+             bool wallCheck = RunDetection(_raysLeft, _wallLayer) || RunDetection(_raysRight, _wallLayer);
+             if (!IsTouchingWall && wallCheck) OnWallThisFrame = true;
 
              _groundColDown = groundDownCheck;
              _groundColLeft = RunDetection(_raysLeft, _groundLayer);
              _groundColRight = RunDetection(_raysRight, _groundLayer);
+             _groundColUp = RunDetection(_raysUp, _groundLayer);
 
              _wallColDown = wallDownCheck;
              _wallColLeft = RunDetection(_raysLeft, _wallLayer);
              _wallColRight = RunDetection(_raysRight, _wallLayer);
+             _wallColUp = RunDetection(_raysUp, _wallLayer);
 
              if (!_wasGrounded && _groundColDown)
              {

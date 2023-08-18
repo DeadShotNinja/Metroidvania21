@@ -18,6 +18,8 @@ namespace Metro
         [SerializeField] private float _coyoteTimeThreshold = 0.1f;
         [Tooltip("Duration for which a jump input is considered 'buffered' and valid.")]
         [SerializeField] private float _jumpBuffer = 0.1f;
+        [Tooltip("Like coyote time but for BEFORE landing and not after leaving a platform.")]
+        [SerializeField] private float _jumpPrebufferTime = 0.2f;
 
         [Header("Wall Jumping")]
         [Tooltip("If enabled, will allow this entity to wall jump.")]
@@ -40,6 +42,7 @@ namespace Metro
         public bool HasBufferedJump => _entity.Collision.IsGrounded 
                                         && LastJumpPressed + _jumpBuffer > Time.time;
 
+        public float JumpPreBufferTime => _jumpPrebufferTime;
         public float WallJumpMinDuration => _wallJumpMinDuration;
         public bool AllowWalljumping => _allowWallJumping;
         public int AllowedJumps => _allowedJumps;
@@ -71,6 +74,7 @@ namespace Metro
             _entity.Gravity.EndedJumpEarly = false;
             _entity.Collision.IsCoyoteUsable = false;
             _entity.Collision.TimeLeftGrounded = float.MinValue;
+            LastJumpPressed = 0f;
         }
         
         public void PerformWallJump()

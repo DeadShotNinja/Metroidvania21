@@ -65,7 +65,7 @@ namespace Metro
             // Both
             DashMovementState = new DashMovementState(this, MovementStateMachine);
             
-            MovementStateMachine.Initialize(IdleGroundedState);
+            MovementStateMachine.Initialize(FallAirborneState);
         }
         
         protected virtual void Start()

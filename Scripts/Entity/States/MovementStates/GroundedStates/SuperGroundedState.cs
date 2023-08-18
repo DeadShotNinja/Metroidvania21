@@ -8,6 +8,17 @@ namespace Metro
 		
 		protected SuperGroundedState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine) { }
 
+		public override void Enter()
+		{
+			base.Enter();
+			
+			if (Time.time - _jump.LastJumpPressed <= _jump.JumpPreBufferTime)
+			{
+				_entity.MovementStateMachine.ChangeState(_entity.JumpAirborneState);
+				return;
+			}
+		}
+
 		public override void LogicUpdate()
 		{
 			base.LogicUpdate();

@@ -51,7 +51,7 @@ namespace Metro
 		        if (go.TryGetComponent(out Room roomHolder))
 		        {
 			        _levelManager.RoomHolders.Add(roomHolder);
-			        roomHolder.ChangeRoomPeriod(TimePeriod.Present);
+			        roomHolder.ShowPresentVariant();
 			        if (roomHolder.RoomID == _levelManager.StartingRoomID) { _levelManager.CurrentRoom = roomHolder; }
 			        else { roomHolder.HideAllVariants(); }
 		        }

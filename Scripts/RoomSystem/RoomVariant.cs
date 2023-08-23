@@ -1,24 +1,25 @@
+using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Metro
 {
 	public class RoomVariant : MonoBehaviour
 	{
 		[Header("Set up")]
+		[Tooltip("This should be the polygon collider confiner associated with this room variant. " +
+		         "If not provided it will try to find on automatically")]
 		[SerializeField] private PolygonCollider2D _cameraConfiner;
 
 		[Header("Debugging")]
         [SerializeField, ReadOnly] private SpawnPoint[] _spawnPoints;
-		[FormerlySerializedAs("_roomTriggers")] [SerializeField, ReadOnly] private RoomSwitchTrigger[] _roomSwitchTriggers;
-
-        // Create enemmy spawn points, can make a serializable struct or a constructor for this that holds a transform and type of 
-        // enemy to spawn.
+		[SerializeField, ReadOnly] private RoomSwitchTrigger[] _roomSwitchTriggers;
 
         public PolygonCollider2D CameraConfiner => _cameraConfiner;
         public SpawnPoint[] SpawnPoints => _spawnPoints;
 
+        public event Action<int, int> RoomSwitchTriggeredAction;
+        
         private void Awake()
         {
             if (_cameraConfiner == null)
@@ -31,7 +32,7 @@ namespace Metro
 			_roomSwitchTriggers = GetComponentsInChildren<RoomSwitchTrigger>(true);
 			foreach (RoomSwitchTrigger trigger in _roomSwitchTriggers)
 			{
-				trigger.SetUp(this);
+				trigger.RoomSwitchTriggerAction += OnRoomSwitchTriggered;
 			}
         }
 
@@ -45,13 +46,17 @@ namespace Metro
 			gameObject.SetActive(false);
 		}
 
-        public void OnTransitionTriggered(int targetHolderID, int targetSpawnID)
+        public void OnRoomSwitchTriggered(int targetRoomID, int targetSpawnID)
         {
-			// TODO: should this be in level manager? Maybe not...
-			ChangeRoomEvent roomEvent;
-			roomEvent.TargetRoomID = targetHolderID;
-			roomEvent.TargetSpawnID = targetSpawnID;
-			EventManager.TriggerEvent(roomEvent);
+	        RoomSwitchTriggeredAction?.Invoke(targetRoomID, targetSpawnID);
         }
-    }
+
+        private void OnDestroy()
+        {
+	        foreach (RoomSwitchTrigger trigger in _roomSwitchTriggers)
+	        {
+		        trigger.RoomSwitchTriggerAction -= OnRoomSwitchTriggered;
+	        }
+        }
+	}
 }

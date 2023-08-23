@@ -13,7 +13,7 @@ namespace Metro
 		{
 			base.Enter();
 			
-			_levelManager.CurrentRoom.ChangeRoomPeriod(TimePeriod.Past);
+			_levelManager.CurrentRoom.ShowPastVariant();
 
 			_levelManager.PostProcessVolume.profile = _levelManager.PastProfile;
 
@@ -64,7 +64,7 @@ namespace Metro
 			_levelManager.CurrentRoom = holder;
 			
 			// TODO: don't need to change time period, just need to make sure it shows the right room.
-			_levelManager.CurrentRoom.ChangeRoomPeriod(TimePeriod.Past);
+			_levelManager.CurrentRoom.ShowPastVariant();
 
 			// TODO; make this work with multiple spawn points, currently does not look for ID.
 			Vector3 spawnPos = holder.GetFirstSpawnPoint();

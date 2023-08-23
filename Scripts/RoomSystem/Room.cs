@@ -1,5 +1,5 @@
+using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Metro
 {
@@ -24,7 +24,7 @@ namespace Metro
 		{
 			if (pastTimeRoomVariant == null || presentTimeRoomVariant == null)
 			{
-				Debug.LogWarning("Missing room setup, trying to set up automatically.", this);
+				Debug.LogWarning("Room not properly setup, trying to set up automatically.", this);
 				RoomVariant[] rooms = GetComponentsInChildren<RoomVariant>(true);
 				if (rooms.Length >= 2)
 				{
@@ -34,28 +34,26 @@ namespace Metro
 				else
 				{
 					Debug.LogError("Room missing RoomVariant child components", this);
+					return;
 				}
 			}
-		}
 
-		public void ChangeRoomPeriod(TimePeriod period)
+			pastTimeRoomVariant.RoomSwitchTriggeredAction += OnRoomSwitchTriggered;
+			presentTimeRoomVariant.RoomSwitchTriggeredAction += OnRoomSwitchTriggered;
+		}
+		
+		public void ShowPastVariant()
 		{
-			switch (period)
-			{
-				case TimePeriod.Past:
-					presentTimeRoomVariant.Hide();
-					pastTimeRoomVariant.Show();
-					CurrentRoomVariant = pastTimeRoomVariant;
-					break;
-				case TimePeriod.Present:
-					pastTimeRoomVariant.Hide();
-					presentTimeRoomVariant.Show();
-					CurrentRoomVariant = presentTimeRoomVariant;
-					break;
-				default:
-					Debug.LogError("Invalid time period", this);
-					break;
-			}
+			presentTimeRoomVariant.Hide();
+			pastTimeRoomVariant.Show();
+			CurrentRoomVariant = pastTimeRoomVariant;
+		}
+		
+		public void ShowPresentVariant()
+		{
+			pastTimeRoomVariant.Hide();
+			presentTimeRoomVariant.Show();
+			CurrentRoomVariant = presentTimeRoomVariant;
 		}
 
 		public void HideAllVariants()
@@ -67,6 +65,20 @@ namespace Metro
 		public Vector3 GetFirstSpawnPoint()
 		{
 			return CurrentRoomVariant.SpawnPoints[0].transform.position;
-		}		
+		}	
+		
+		private void OnRoomSwitchTriggered(int targetRoomID, int targetSpawnID)
+		{
+			ChangeRoomEvent roomEvent;
+			roomEvent.TargetRoomID = targetRoomID;
+			roomEvent.TargetSpawnID = targetSpawnID;
+			EventManager.TriggerEvent(roomEvent);
+		}
+
+		private void OnDestroy()
+		{
+			pastTimeRoomVariant.RoomSwitchTriggeredAction -= OnRoomSwitchTriggered;
+			presentTimeRoomVariant.RoomSwitchTriggeredAction -= OnRoomSwitchTriggered;
+		}
 	}
 }

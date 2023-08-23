@@ -14,7 +14,7 @@ namespace Metro
         {
             base.Enter();
 
-            _levelManager.CurrentRoom.ChangeRoomPeriod(TimePeriod.Present);
+            _levelManager.CurrentRoom.ShowPresentVariant();
 
             _levelManager.PostProcessVolume.profile = _levelManager.PresentProfile;
 
@@ -67,7 +67,7 @@ namespace Metro
             _levelManager.CurrentRoom = holder;
 
             // TODO: don't need to change time period, just need to make sure it shows the right room.
-            _levelManager.CurrentRoom.ChangeRoomPeriod(TimePeriod.Present);
+            _levelManager.CurrentRoom.ShowPresentVariant();
             
             SpawnPoint newSpawn = Array.Find(_levelManager.CurrentRoom.CurrentRoomVariant.SpawnPoints,
                 x => x.SpawnID == eventData.TargetSpawnID);

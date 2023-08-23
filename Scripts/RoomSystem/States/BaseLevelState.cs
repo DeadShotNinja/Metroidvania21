@@ -4,8 +4,11 @@ namespace Metro
 {
 	public abstract class BaseLevelState : BaseState<BaseLevelState>
 	{
-		protected BaseLevelState(StateMachine<BaseLevelState> stateMachine) : base(stateMachine)
+		protected LevelManager _levelManager;
+		
+		protected BaseLevelState(LevelManager levelManager, StateMachine<BaseLevelState> stateMachine) : base(stateMachine)
 		{
+			_levelManager = levelManager;
 		}
 	}
 }

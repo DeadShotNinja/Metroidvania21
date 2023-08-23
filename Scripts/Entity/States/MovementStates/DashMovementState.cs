@@ -4,9 +4,7 @@ namespace Metro
 {
 	public class DashMovementState : BaseMovementState
 	{
-		private float _dashTimer;
-		private float _checkBuffer;
-		
+		private Vector2 _dashDir;
 		public DashMovementState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine) { }
 
 		public override void Enter()
@@ -14,15 +12,21 @@ namespace Metro
 			base.Enter();
 			
 			_entity.StateText.SetText("DASHING");
-			_dashTimer = _horizontalMove.DashDuration + Time.time;
-			_checkBuffer = Time.time + 0.1f;
-		}
+			_dash.Dash();
+			_dashDir = _entity.InputProvider.MoveInput;
+            _dash.ApplyDash(_dashDir);
+        }
 
 		public override void LogicUpdate()
 		{
 			base.LogicUpdate();
-			
-			if (ShouldSwitchToIdle())
+
+
+
+			if (ShouldDash())
+				return;
+
+            if (ShouldSwitchToIdle())
 			{
 				_entity.MovementStateMachine.ChangeState(_entity.IdleGroundedState);
 				return;
@@ -39,38 +43,40 @@ namespace Metro
 		{
 			base.PhysicsUpdate();
 
-			if (_dashTimer > Time.time)
-			{
-				_horizontalMove.ApplyDash(_entity.InputProvider.MoveInput.x);
-			}
+			_dash.ApplyDash(_dashDir);
 		}
 
 		public override void Exit()
 		{
 			base.Exit();
-			
-			if (_horizontalMove != null)
-			{
-				_horizontalMove.CompleteDash();
-			}
 		}
 		
 		private bool ShouldSwitchToFall()
 		{
-			if (_checkBuffer < Time.time && _entity.EntityRigidbody.velocity.x == 0f
+			if (_entity.EntityRigidbody.velocity.x == 0f
 			    && !_entity.Collision.IsGrounded)
 				return true;
 
-			return _dashTimer < Time.time && !_entity.Collision.IsGrounded;
+			return !_entity.Collision.IsGrounded;
 		}
 		
 		private bool ShouldSwitchToIdle()
 		{
-			if (_checkBuffer < Time.time && _entity.EntityRigidbody.velocity.x == 0f
+			if (_entity.EntityRigidbody.velocity.x == 0f
 			    && _entity.Collision.IsGrounded)
 				return true;
 
-			return _dashTimer < Time.time && _entity.Collision.IsGrounded;
+			return _entity.Collision.IsGrounded;
 		}
+		private bool ShouldDash()
+		{
+            if (_entity.EntityRigidbody.velocity.magnitude < 0.2f)
+                return false;
+
+            if (_dash.TimeSinceLastDash + _dash.DashDuration > Time.time)
+                return true;
+
+			return false;
+        }
 	}
 }

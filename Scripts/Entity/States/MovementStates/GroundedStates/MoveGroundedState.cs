@@ -28,7 +28,6 @@ namespace Metro
         public override void PhysicsUpdate()
         {
             base.PhysicsUpdate();
-
             _horizontalMove.ApplyMovement(_entity.InputProvider.MoveInput.x);
         }
         

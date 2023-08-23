@@ -1,11 +1,7 @@
-using UnityEngine;
-
 namespace Metro
 {
 	public class WallSlideWallingState : SuperWallingState
 	{
-		private bool _colUp;
-		
 		public WallSlideWallingState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine) { }
 
 		public override void Enter()
@@ -18,8 +14,6 @@ namespace Metro
 		public override void LogicUpdate()
 		{
 			base.LogicUpdate();
-			
-			_colUp = _entity.Collision.IsWallUp || _entity.Collision.IsGroundUp;
 			
 			if (ShouldSwitchToFall())
 			{
@@ -43,10 +37,10 @@ namespace Metro
 		
 		private bool ShouldSwitchToFall()
 		{
-			if (_entity.Collision.IsWallRight && _entity.InputProvider.MoveInput.x <= 0f)
+			if (_entity.Collision.IsWallRight && _entity.InputProvider.MoveInput.x < 0f)
 				return true;
 
-			if (_entity.Collision.IsWallLeft && _entity.InputProvider.MoveInput.x >= 0f)
+			if (_entity.Collision.IsWallLeft && _entity.InputProvider.MoveInput.x > 0f)
 				return true;
 
 			return !_entity.Collision.IsTouchingWall;
@@ -60,7 +54,7 @@ namespace Metro
 			if (!_entity.InputProvider.JumpInput.Pressed)
 				return false;
 
-			if (_colUp)
+			if (_entity.Collision.IsWallUp || _entity.Collision.IsGroundUp)
 				return false;
 
 			if (_entity.Collision.IsGrounded)

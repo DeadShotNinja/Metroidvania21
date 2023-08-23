@@ -83,7 +83,6 @@ namespace Metro
 
         protected void FixedUpdate()
         {
-            _gravity.CalculateJumpApex();
             _gravity.ApplyGravity();
             
             MovementStateMachine.CurrentState.PhysicsUpdate();

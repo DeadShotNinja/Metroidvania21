@@ -1,6 +1,5 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Metro
 {
@@ -67,11 +66,8 @@ namespace Metro
         
         public void PerformJump()
         {
-            //LastJumpPressed = Time.time;
-            
             JumpCount++;
             _rb.velocity = new Vector2(_rb.velocity.x, _jumpSpeed);
-            _entity.Gravity.EndedJumpEarly = false;
             _entity.Collision.IsCoyoteUsable = false;
             _entity.Collision.TimeLeftGrounded = float.MinValue;
             LastJumpPressed = 0f;
@@ -79,17 +75,8 @@ namespace Metro
         
         public void PerformWallJump()
         {
-            _entity.Gravity.EndedJumpEarly = false;
             float jumpDirection = _entity.Collision.IsWallLeft ? 1f : -1f;
             _rb.velocity = new Vector2(_wallJumpDistance * jumpDirection, _wallJumpHeight);
-        }
-        
-        public void JumpReleased()
-        {
-            if (!_entity.Collision.IsGrounded && !_entity.Gravity.EndedJumpEarly && _rb.velocity.y > 0)
-            {
-                _entity.Gravity.EndedJumpEarly = true;
-            }
         }
         
         private void Event_OnGrounded()

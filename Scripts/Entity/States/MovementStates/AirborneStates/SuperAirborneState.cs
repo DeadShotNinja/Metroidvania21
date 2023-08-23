@@ -44,7 +44,7 @@ namespace Metro
 		
 		private bool ShouldSwitchToDash()
 		{
-			if (_horizontalMove.DashNeedsReset)
+			if (!_dash.CanDash())
 				return false;
 			
 			return _entity.InputProvider.DashInput.Pressed;

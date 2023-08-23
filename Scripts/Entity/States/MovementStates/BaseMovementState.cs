@@ -11,7 +11,8 @@ namespace Metro
         protected EntityHorizontalMove _horizontalMove;
         protected EntityJump _jump;
         protected EntityWallSlide _wallSlide;
-        
+        protected EntityDash _dash;
+
         protected BaseMovementState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(stateMachine)
         {
             _entity = entity;
@@ -28,6 +29,10 @@ namespace Metro
                 else if (component is EntityWallSlide wallSlide)
                 {
                     _wallSlide = wallSlide;
+                }
+                else if (component is EntityDash dash)
+                {
+                    _dash = dash;
                 }
             }
         }

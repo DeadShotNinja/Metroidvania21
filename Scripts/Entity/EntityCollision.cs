@@ -137,7 +137,9 @@ namespace Metro
             }
         
             if (!Application.isPlaying) return;
-        
+
+            Debug.Log(_entity);
+                
             Gizmos.color = Color.red;
             Vector3 move = new Vector3(_entity.EntityRigidbody.velocity.x, _entity.EntityRigidbody.velocity.y) * Time.deltaTime;
             Gizmos.DrawWireCube(entityPosition + _entityBounds.center + move, _entityBounds.size);

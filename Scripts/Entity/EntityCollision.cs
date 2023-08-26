@@ -17,6 +17,8 @@ namespace Metro
         [SerializeField] private LayerMask _groundLayer;
         [Tooltip("The layer mask to look for when checking for wall.")]
         [SerializeField] private LayerMask _wallLayer;
+        [Tooltip("The layer mask to look for when checking for collision with hazards. (Not raycast based)")]
+        [SerializeField] private LayerMask _hazardLayer;
         [Tooltip("The number of rays to shoot from each side, more is better at the cost of performance.")]
         [SerializeField] private int _detectorCount = 5;
         [Tooltip("How far out to check for collision from the entity.")]
@@ -31,6 +33,8 @@ namespace Metro
         private bool _groundColRight, _groundColLeft, _groundColDown, _groundColUp;
         private bool _wallColRight, _wallColLeft, _wallColDown, _wallColUp;
         private bool _wasGrounded;
+
+        #region Properties
         
         public bool IsGrounded => _groundColDown || _wallColDown;
         public bool IsGroundRight => _groundColRight;
@@ -40,12 +44,16 @@ namespace Metro
         public bool IsWallRight => _wallColRight;
         public bool IsWallLeft => _wallColLeft;
         public bool IsWallUp => _wallColUp;
+        public LayerMask HazardLayer => _hazardLayer;
+        public LayerMask CollidableLayers => _groundLayer | _wallLayer | _hazardLayer;
         
         public float TimeLeftGrounded { get; set; }
         public bool IsCoyoteUsable { get; set; }
         public bool GroundedThisFrame { get; private set; }
         public bool LeavingGroundedThisFrame { get; private set; }
         public bool OnWallThisFrame { get; private set; }
+        
+        #endregion
 
         public event Action OnGrounded;
         

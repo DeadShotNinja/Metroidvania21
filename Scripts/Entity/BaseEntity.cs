@@ -23,6 +23,7 @@ namespace Metro
         public EntityGravity Gravity => _gravity;
         
         public Rigidbody2D EntityRigidbody { get; protected set; }
+        public Collider2D EntityCollider { get; protected set; }
         public EntityComponent[] EntityComponents { get; protected set; }
         public IInputProvider InputProvider { get; protected set; }
 
@@ -46,6 +47,7 @@ namespace Metro
         protected virtual void Awake()
         {
             EntityRigidbody = GetComponent<Rigidbody2D>();
+            EntityCollider = GetComponent<Collider2D>();
             
             _collision.Initialize(this);
             _gravity.Initialize(this);
@@ -101,6 +103,15 @@ namespace Metro
             foreach (EntityComponent component in EntityComponents)
             {
                 component.LogicUpdate();
+            }
+        }
+
+        private void OnCollisionEnter2D(Collision2D other)
+        {
+            if ((_collision.HazardLayer.value & (1 << other.gameObject.layer)) != 0)
+            {
+                EntityRigidbody.velocity = Vector2.zero;
+                EventManager.TriggerEvent(new PlayerDiedEvent());
             }
         }
 

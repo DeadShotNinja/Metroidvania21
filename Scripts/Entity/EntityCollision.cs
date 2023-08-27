@@ -33,6 +33,7 @@ namespace Metro
         private bool _groundColRight, _groundColLeft, _groundColDown, _groundColUp;
         private bool _wallColRight, _wallColLeft, _wallColDown, _wallColUp;
         private bool _wasGrounded;
+        private bool _rightRayGrounded, _leftRayGrounded;
 
         #region Properties
         
@@ -44,6 +45,8 @@ namespace Metro
         public bool IsWallRight => _wallColRight;
         public bool IsWallLeft => _wallColLeft;
         public bool IsWallUp => _wallColUp;
+        public bool IsRightRayGrounded => _rightRayGrounded;
+        public bool IsLeftRayGrounded => _leftRayGrounded;
         public LayerMask HazardLayer => _hazardLayer;
         public LayerMask CollidableLayers => _groundLayer | _wallLayer | _hazardLayer;
         
@@ -94,6 +97,9 @@ namespace Metro
              _wallColLeft = RunDetection(_raysLeft, _wallLayer);
              _wallColRight = RunDetection(_raysRight, _wallLayer);
              _wallColUp = RunDetection(_raysUp, _wallLayer);
+             
+             _rightRayGrounded = IsSpecificRayHitting(_raysDown, _groundLayer, _detectorCount - 1);
+             _leftRayGrounded = IsSpecificRayHitting(_raysDown, _groundLayer, 0);
 
              if (!_wasGrounded && _groundColDown)
              {
@@ -107,6 +113,12 @@ namespace Metro
              {
                  return EvaluateRayPositions(range).Any(point =>
                      Physics2D.Raycast(point, range.Dir, _detectionRayLength, mask));
+             }
+
+             bool IsSpecificRayHitting(RayRange range, LayerMask mask, int specificRayIndex)
+             {
+                 List<Vector2> rayPositions = EvaluateRayPositions(range).ToList();
+                 return Physics2D.Raycast(rayPositions[specificRayIndex], range.Dir, _detectionRayLength, mask);
              }
         }
         

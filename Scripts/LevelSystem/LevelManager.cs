@@ -6,7 +6,7 @@ using UnityEngine.Rendering;
 
 namespace Metro
 {
-	public class LevelManager : MonoBehaviour
+	public class LevelManager : Singleton<LevelManager>
 	{
 		[Header("Player Setup")]
 		[Tooltip("Make this true if the player prefab was dragged into the scene manually. (Must be tagged with Player)")]
@@ -86,8 +86,10 @@ namespace Metro
 
 		#endregion
 		
-		private void Awake()
+		protected override void Awake()
 		{
+			base.Awake();
+			
 			RoomHolders = new List<Room>();
 			LevelStateMachine = new StateMachine<BaseLevelState>();
 

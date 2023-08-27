@@ -13,6 +13,7 @@ namespace Metro
         [SerializeField] private Transform _target;
         [SerializeField] private float _stopDistance = 3f;
 
+        // I need to set this target from PlayerEntity in LevelManage
         public Transform Target => _target;
         public float StopDistance => _stopDistance;
         
@@ -26,6 +27,7 @@ namespace Metro
 
         public IdleBehaviourState IdleBehaviourState { get; private set; }
         public ChaseBehaviourState ChaseBehaviorState { get; private set; }
+        public PatrolBehaviourState PatrolBehaviourState { get; private set; }
 
         #endregion
 
@@ -39,7 +41,10 @@ namespace Metro
 
             IdleBehaviourState = new IdleBehaviourState(this, BehaviourStateMachine);
             ChaseBehaviorState = new ChaseBehaviourState(this, BehaviourStateMachine);
-            
+            PatrolBehaviourState = new PatrolBehaviourState(this, BehaviourStateMachine);
+
+            // TODO: Might not need LevelManager to be a singleton.
+            //_target = LevelManager.Instance.PlayerEntity.transform;
             BehaviourStateMachine.Initialize(IdleBehaviourState);
         }
 

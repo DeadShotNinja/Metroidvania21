@@ -45,6 +45,8 @@ namespace Metro
         public bool IsWallRight => _wallColRight;
         public bool IsWallLeft => _wallColLeft;
         public bool IsWallUp => _wallColUp;
+        public bool IsCollidingRight => _groundColRight || _wallColRight;
+        public bool IsCollidingLeft => _groundColLeft || _wallColLeft;
         public bool IsRightRayGrounded => _rightRayGrounded;
         public bool IsLeftRayGrounded => _leftRayGrounded;
         public LayerMask HazardLayer => _hazardLayer;

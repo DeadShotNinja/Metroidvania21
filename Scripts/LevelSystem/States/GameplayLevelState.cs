@@ -141,7 +141,8 @@ namespace Metro
 		
 		private void OnPlayerDied(PlayerDiedEvent eventData)
 		{
-			_levelManager.PlayerEntity.transform.position = _levelManager.CheckPoint;
+			//_levelManager.PlayerEntity.transform.position = _levelManager.CheckPoint;
+			_levelManager.PlayerEntity.EntityRespawn(_levelManager.CheckPoint);
 		}
 		
 		public override void DrawGizmosWhenSelected()

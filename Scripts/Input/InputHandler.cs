@@ -32,6 +32,8 @@ namespace Metro
         private void OnEnable()
         {
             _playerInputActions.Player.Enable();
+            EventManager.StartListening<PlayerDiedEvent>(OnPlayerDied);
+            EventManager.StartListening<PlayerRespawnedEvent>(OnPlayerRespawned);
         }
 
         private void Update()
@@ -44,10 +46,22 @@ namespace Metro
             JumpInput.Reset();
             DashInput.Reset();
         }
+        
+        private void OnPlayerDied(PlayerDiedEvent eventData)
+        {
+            _playerInputActions.Disable();
+        }
+        
+        private void OnPlayerRespawned(PlayerRespawnedEvent eventData)
+        {
+            _playerInputActions.Enable();
+        }
 
         private void OnDisable()
         {
             _playerInputActions.Disable();
+            EventManager.StopListening<PlayerDiedEvent>(OnPlayerDied);
+            EventManager.StopListening<PlayerRespawnedEvent>(OnPlayerRespawned);
         }
     }
 }

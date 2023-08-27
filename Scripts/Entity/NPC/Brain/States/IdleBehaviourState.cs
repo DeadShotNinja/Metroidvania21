@@ -14,6 +14,8 @@ namespace Metro
         public override void Enter()
         {
             base.Enter();
+            
+            _brain.NPC.AIStateText.SetText("");
         }
 
         public override void LogicUpdate()

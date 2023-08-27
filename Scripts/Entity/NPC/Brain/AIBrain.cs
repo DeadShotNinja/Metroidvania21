@@ -36,6 +36,7 @@ namespace Metro
             NPC = GetComponent<NPCEntity>();
             
             JumpInput = new InputState();
+            DashInput = new InputState();
 
             BehaviourStateMachine = new StateMachine<BaseBehaviourState>();
 

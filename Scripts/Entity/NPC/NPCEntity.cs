@@ -9,7 +9,7 @@ namespace Metro
     [RequireComponent(typeof(AIBrain))]
     public class NPCEntity : BaseEntity
     {
-        [SerializeField] private TMP_Text _aIStateText;
+        public TMP_Text AIStateText;
         
         protected override void Start()
         {

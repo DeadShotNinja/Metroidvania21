@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using TMPro;
@@ -13,9 +14,12 @@ namespace Metro
     public abstract class BaseEntity : MonoBehaviour
     {
         [InfoBox("Physics")]
-        [SerializeField] private EntityCollision _collision;
+        [SerializeField] protected EntityCollision _collision;
         [SerializeField] private EntityGravity _gravity;
 
+        [Header("Respawn")]
+        [SerializeField] private float _respawnDelay = 1f;
+        
         [Header("Debugging")]
         public TMP_Text StateText;
        
@@ -26,6 +30,8 @@ namespace Metro
         public Collider2D EntityCollider { get; protected set; }
         public EntityComponent[] EntityComponents { get; protected set; }
         public IInputProvider InputProvider { get; protected set; }
+
+        public bool IsDead { get; protected set; }
 
         public StateMachine<BaseMovementState> MovementStateMachine { get; private set; }
 
@@ -43,6 +49,9 @@ namespace Metro
         public DashMovementState DashMovementState { get; private set; }
 
         #endregion
+
+        public event Action EntityDiedAction;
+        public event Action EntityRespawnedAction;
 
         protected virtual void Awake()
         {
@@ -105,13 +114,40 @@ namespace Metro
                 component.LogicUpdate();
             }
         }
+        
+        public void EntityRespawn(Vector3 respawnPos)
+        {
+            StartCoroutine(Respawn_Couroutine(respawnPos));
+        }
+        
+        private IEnumerator Respawn_Couroutine(Vector3 respawnPos)
+        {
+            yield return new WaitForSeconds(_respawnDelay);
+            
+            EntityRigidbody.bodyType = RigidbodyType2D.Dynamic;
+            EntityCollider.enabled = true;
+            IsDead = false;
+            transform.position = respawnPos;
+            EntityRespawnedAction?.Invoke();
+            if (this is PlayerEntity)
+            {
+                EventManager.TriggerEvent(new PlayerRespawnedEvent());
+            }
+        }
 
-        private void OnCollisionEnter2D(Collision2D other)
+        protected virtual void OnCollisionEnter2D(Collision2D other)
         {
             if ((_collision.HazardLayer.value & (1 << other.gameObject.layer)) != 0)
             {
                 EntityRigidbody.velocity = Vector2.zero;
-                EventManager.TriggerEvent(new PlayerDiedEvent());
+                EntityRigidbody.bodyType = RigidbodyType2D.Static;
+                EntityCollider.enabled = false;
+                IsDead = true;
+                EntityDiedAction?.Invoke();
+                if (this is PlayerEntity)
+                {
+                    EventManager.TriggerEvent(new PlayerDiedEvent());
+                }
             }
         }
 

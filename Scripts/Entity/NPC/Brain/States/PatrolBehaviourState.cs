@@ -14,6 +14,7 @@ namespace Metro
 		{
 			base.Enter();
 
+			_brain.NPC.AIStateText.SetText("Patrolling");
 			_moveDirection = 1f;
 		}
 
@@ -38,11 +39,11 @@ namespace Metro
 		
 		private void ValidateDirection()
 		{
-			if (_moveDirection == 1f && !_brain.NPC.Collision.IsRightRayGrounded)
+			if (_moveDirection == 1f && (!_brain.NPC.Collision.IsRightRayGrounded || _brain.NPC.Collision.IsCollidingRight))
 			{
 				_moveDirection = -1f;
 			}
-			else if (_moveDirection == -1f && !_brain.NPC.Collision.IsLeftRayGrounded)
+			else if (_moveDirection == -1f && (!_brain.NPC.Collision.IsLeftRayGrounded || _brain.NPC.Collision.IsCollidingLeft))
 			{
 				_moveDirection = 1f;
 			}

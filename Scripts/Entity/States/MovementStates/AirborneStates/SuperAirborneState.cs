@@ -1,3 +1,4 @@
+using MoreMountains.Feedbacks;
 using UnityEngine;
 
 namespace Metro
@@ -6,7 +7,8 @@ namespace Metro
 	{
 		protected bool _colUp;
 		
-		public SuperAirborneState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine) { }
+		protected SuperAirborneState(BaseEntity entity, MMFeedbacks feedbacks, 
+			StateMachine<BaseMovementState> stateMachine) : base(entity, feedbacks, stateMachine) { }
 
 		public override void LogicUpdate()
 		{

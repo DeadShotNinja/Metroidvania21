@@ -1,8 +1,11 @@
+using MoreMountains.Feedbacks;
+
 namespace Metro
 {
 	public class WallSlideWallingState : SuperWallingState
 	{
-		public WallSlideWallingState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine) { }
+		public WallSlideWallingState(BaseEntity entity, MMFeedbacks feedbacks, 
+			StateMachine<BaseMovementState> stateMachine) : base(entity, feedbacks, stateMachine) { }
 
 		public override void Enter()
 		{

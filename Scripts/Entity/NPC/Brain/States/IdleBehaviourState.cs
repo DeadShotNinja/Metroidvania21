@@ -50,7 +50,7 @@ namespace Metro
         
         private bool ShouldSwitchToPatrol()
         {
-            return true;
+            return _brain.IsPatrolling;
         }
     }
 }

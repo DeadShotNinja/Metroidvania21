@@ -12,10 +12,12 @@ namespace Metro
         [Header("Set Up")]
         [SerializeField] private Transform _target;
         [SerializeField] private float _stopDistance = 3f;
+        [SerializeField] private bool _isPatrolling;
 
         // I need to set this target from PlayerEntity in LevelManage
         public Transform Target => _target;
         public float StopDistance => _stopDistance;
+        public bool IsPatrolling => _isPatrolling;
         
         public NPCEntity NPC { get; private set; }
         public Vector2 MoveInput { get; set; }

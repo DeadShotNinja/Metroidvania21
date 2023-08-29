@@ -1,3 +1,4 @@
+using MoreMountains.Feedbacks;
 using UnityEngine;
 
 namespace Metro
@@ -6,7 +7,8 @@ namespace Metro
 	{
 		protected bool _colLeft, _colRight, _colUp;
 		
-		protected SuperGroundedState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine) { }
+		protected SuperGroundedState(BaseEntity entity, MMFeedbacks feedbacks, 
+			StateMachine<BaseMovementState> stateMachine) : base(entity, feedbacks, stateMachine) { }
 
 		public override void Enter()
 		{

@@ -1,3 +1,5 @@
+using MoreMountains.Feedbacks;
+
 namespace Metro
 {
     /// <summary>
@@ -5,7 +7,8 @@ namespace Metro
     /// </summary>
     public class MoveGroundedState : SuperGroundedState
     {
-        public MoveGroundedState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine) { }
+        public MoveGroundedState(BaseEntity entity, MMFeedbacks feedbacks, 
+            StateMachine<BaseMovementState> stateMachine) : base(entity, feedbacks, stateMachine) { }
 
         public override void Enter()
         {

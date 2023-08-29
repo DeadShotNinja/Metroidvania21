@@ -1,10 +1,12 @@
+using MoreMountains.Feedbacks;
 using UnityEngine;
 
 namespace Metro
 {
 	public class SuperWallingState : BaseMovementState
 	{
-		public SuperWallingState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine) { }
+		public SuperWallingState(BaseEntity entity, MMFeedbacks feedbacks, 
+			StateMachine<BaseMovementState> stateMachine) : base(entity, feedbacks, stateMachine) { }
 		
 		public override void LogicUpdate()
 		{

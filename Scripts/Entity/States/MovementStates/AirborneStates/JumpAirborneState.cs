@@ -1,8 +1,11 @@
+using MoreMountains.Feedbacks;
+
 namespace Metro
 {
 	public class JumpAirborneState : SuperAirborneState
 	{
-		public JumpAirborneState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine) { }
+		public JumpAirborneState(BaseEntity entity, MMFeedbacks feedbacks, 
+			StateMachine<BaseMovementState> stateMachine) : base(entity, feedbacks, stateMachine) { }
 
 		public override void Enter()
 		{

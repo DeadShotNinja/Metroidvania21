@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using MoreMountains.Feedbacks;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using TMPro;
@@ -19,6 +20,9 @@ namespace Metro
 
         [Header("Respawn")]
         [SerializeField] private float _respawnDelay = 1f;
+        
+        [Header("MMFeedbacks")]
+        [SerializeField] private FeedbacksData _feedbacks;
         
         [Header("Debugging")]
         public TMP_Text StateText;
@@ -66,15 +70,15 @@ namespace Metro
             MovementStateMachine = new StateMachine<BaseMovementState>();
             
             // Airborne
-            JumpAirborneState = new JumpAirborneState(this, MovementStateMachine);
-            FallAirborneState = new FallAirborneState(this, MovementStateMachine);
-            WallSlideWallingState = new WallSlideWallingState(this, MovementStateMachine);
-            WallJumpWallingState = new WallJumpWallingState(this, MovementStateMachine);
+            JumpAirborneState = new JumpAirborneState(this, _feedbacks.JumpFeedbacks, MovementStateMachine);
+            FallAirborneState = new FallAirborneState(this, _feedbacks.FallFeedbacks, MovementStateMachine);
+            WallSlideWallingState = new WallSlideWallingState(this, _feedbacks.WallSlideFeedbacks, MovementStateMachine);
+            WallJumpWallingState = new WallJumpWallingState(this, _feedbacks.WallJumpFeedbacks, MovementStateMachine);
             // Grounded
-            IdleGroundedState = new IdleGroundedState(this, MovementStateMachine);
-            MoveGroundedState = new MoveGroundedState(this, MovementStateMachine);
+            IdleGroundedState = new IdleGroundedState(this, _feedbacks.IdleGroundedFeedbacks, MovementStateMachine);
+            MoveGroundedState = new MoveGroundedState(this, _feedbacks.MoveGroundedFeedbacks, MovementStateMachine);
             // Both
-            DashMovementState = new DashMovementState(this, MovementStateMachine);
+            DashMovementState = new DashMovementState(this, _feedbacks.DashFeedbacks, MovementStateMachine);
             
             MovementStateMachine.Initialize(FallAirborneState);
         }

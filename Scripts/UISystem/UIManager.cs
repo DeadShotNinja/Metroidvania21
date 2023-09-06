@@ -7,80 +7,43 @@ namespace Metro
 {
 	public class UIManager : MonoBehaviour
 	{
-		[SerializeField] private GameObject _UIPanel;
+		[Header("UI Panels")]
+		[SerializeField] private HUDPanel _hudPanel;
+		[SerializeField] private PausePanel _pausePanel;
+		[SerializeField] private DisplayPanel _displayPanel;
+		[SerializeField] private ConfirmationPanel _confirmationPanel;
 
-		[Header("Fade Settings")]
-		[SerializeField] private Image _fadeImage;
-		[SerializeField] private float _fadeSpeed = 1f;
-
-		private Coroutine _currentFadeCoroutine;
+		[Header("Fade Setup")]
+		[SerializeField] private FadePanel _fadePanel;
 		
 		private void Awake()
 		{
-			_UIPanel.SetActive(false);
+			if (_hudPanel != null) _hudPanel.gameObject.SetActive(true);
+			if (_pausePanel != null) _pausePanel.gameObject.SetActive(false);
+            if (_displayPanel != null) _displayPanel.gameObject.SetActive(false);
+			if (_confirmationPanel != null) _confirmationPanel.gameObject.SetActive(false);
 		}
 
 		private void OnEnable()
 		{
-			EventManager.StartListening<PlayerDiedEvent>(OnPlayerDied);
-			EventManager.StartListening<PlayerRespawnedEvent>(OnPlayerRespawned);
+			EventManager.StartListening<ScreenFadeEvent>(OnFadeScreen);
 			EventManager.StartListening<WinGameEvent>(OnWinGame);
 		}
 
 		private void OnDisable()
 		{
-			EventManager.StopListening<PlayerDiedEvent>(OnPlayerDied);
-			EventManager.StopListening<PlayerRespawnedEvent>(OnPlayerRespawned);
+			EventManager.StopListening<ScreenFadeEvent>(OnFadeScreen);
 			EventManager.StopListening<WinGameEvent>(OnWinGame);
 		}
 		
-		private void OnPlayerDied(PlayerDiedEvent eventData)
+		private void OnFadeScreen(ScreenFadeEvent eventData)
 		{
-			StopCurrentFadeCoroutine();
-			_currentFadeCoroutine = StartCoroutine(FadeIn());
-		}
-		
-		private void OnPlayerRespawned(PlayerRespawnedEvent eventData)
-		{
-			StopCurrentFadeCoroutine();
-			_currentFadeCoroutine = StartCoroutine(FadeOut());
-		}
-		
-		private void StopCurrentFadeCoroutine()
-		{
-			if (_currentFadeCoroutine != null)
-			{
-				StopCoroutine(_currentFadeCoroutine);
-			}
-		}
-		
-		private IEnumerator FadeIn()
-		{
-			_fadeImage.gameObject.SetActive(true);
-			
-			for (float t = 0f; t <= 1; t += Time.deltaTime * _fadeSpeed)
-			{
-				Color newColor = new Color(0f, 0f, 0f, Mathf.Lerp(0f, 1f, t));
-				_fadeImage.color = newColor;
-				yield return null;
-			}
-		}
-		
-		private IEnumerator FadeOut()
-		{
-			for (float t = 0f; t <= 1f; t += Time.deltaTime * _fadeSpeed)
-			{
-				Color newColor = new Color(0f, 0f, 0f, Mathf.Lerp(1f, 0f, t));
-				_fadeImage.color = newColor;
-				yield return null;
-			}
-			
-			_fadeImage.gameObject.SetActive(false);
+			_fadePanel.FadeScreen(eventData.FadeType, eventData.FadeSpeed);
 		}
 		
 		private void OnWinGame(WinGameEvent eventData)
 		{
-			_UIPanel.SetActive(true);
+			_displayPanel.gameObject.SetActive(true);
 		}
 		
 		public void OnClick_GTFOButton()

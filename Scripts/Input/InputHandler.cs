@@ -18,6 +18,8 @@ namespace Metro
         // Buttons
         public InputState JumpInput { get; set; }
         public InputState DashInput { get; set; }
+        public InputState TimeSwapInput { get; set; }
+        public InputState InteractInput { get; set; }
 
         #endregion
 
@@ -27,6 +29,8 @@ namespace Metro
 
             JumpInput = new InputState(_playerInputActions.Player.Jump);
             DashInput = new InputState(_playerInputActions.Player.Dash);
+            TimeSwapInput = new InputState(_playerInputActions.Player.TimeSwap);
+            InteractInput = new InputState(_playerInputActions.Player.Interact);
         }
 
         private void OnEnable()
@@ -34,6 +38,9 @@ namespace Metro
             _playerInputActions.Player.Enable();
             EventManager.StartListening<PlayerDiedEvent>(OnPlayerDied);
             EventManager.StartListening<PlayerRespawnedEvent>(OnPlayerRespawned);
+            
+            // TODO: Other events proably should change to this one
+            EventManager.StartListening<PlayerControlsEvent>(OnPlayerControlsToggled);
         }
 
         private void Update()
@@ -45,6 +52,20 @@ namespace Metro
         {
             JumpInput.Reset();
             DashInput.Reset();
+            TimeSwapInput.Reset();
+            InteractInput.Reset();
+        }
+
+        private void OnPlayerControlsToggled(PlayerControlsEvent eventData)
+        {
+            if (eventData.ControlsEnabled)
+            {
+                _playerInputActions.Player.Enable();
+            }
+            else
+            {
+                _playerInputActions.Player.Disable();
+            }
         }
         
         private void OnPlayerDied(PlayerDiedEvent eventData)
@@ -62,6 +83,9 @@ namespace Metro
             _playerInputActions.Disable();
             EventManager.StopListening<PlayerDiedEvent>(OnPlayerDied);
             EventManager.StopListening<PlayerRespawnedEvent>(OnPlayerRespawned);
+            
+            // TODO: Other events proably should change to this one
+            EventManager.StopListening<PlayerControlsEvent>(OnPlayerControlsToggled);
         }
     }
 }

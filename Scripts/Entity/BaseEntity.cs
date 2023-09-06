@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using MoreMountains.Feedbacks;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using TMPro;
@@ -12,13 +11,14 @@ namespace Metro
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(Collider2D))]
-    public abstract class BaseEntity : MonoBehaviour
+    public abstract class BaseEntity : MonoBehaviour, IDamagable, IAttachable
     {
         [InfoBox("Physics")]
         [SerializeField] protected EntityCollision _collision;
         [SerializeField] private EntityGravity _gravity;
 
-        [Header("Respawn")]
+        [BoxGroup("Respawn")]
+        [Tooltip("Time to wait before respawning the entity.")]
         [SerializeField] private float _respawnDelay = 1f;
         
         [Header("MMFeedbacks")]
@@ -36,6 +36,7 @@ namespace Metro
         public IInputProvider InputProvider { get; protected set; }
 
         public bool IsDead { get; protected set; }
+        public bool IsAttached { get; set; }
 
         public StateMachine<BaseMovementState> MovementStateMachine { get; private set; }
 
@@ -118,13 +119,22 @@ namespace Metro
                 component.LogicUpdate();
             }
         }
+
+        public virtual void TakeDamage()
+        {
+            EntityRigidbody.velocity = Vector2.zero;
+            EntityRigidbody.bodyType = RigidbodyType2D.Static;
+            EntityCollider.enabled = false;
+            IsDead = true;
+            EntityDiedAction?.Invoke();
+        }
         
         public void EntityRespawn(Vector3 respawnPos)
         {
-            StartCoroutine(Respawn_Couroutine(respawnPos));
+            StartCoroutine(Respawn_Coroutine(respawnPos));
         }
         
-        private IEnumerator Respawn_Couroutine(Vector3 respawnPos)
+        protected virtual IEnumerator Respawn_Coroutine(Vector3 respawnPos)
         {
             yield return new WaitForSeconds(_respawnDelay);
             
@@ -133,26 +143,11 @@ namespace Metro
             IsDead = false;
             transform.position = respawnPos;
             EntityRespawnedAction?.Invoke();
-            if (this is PlayerEntity)
-            {
-                EventManager.TriggerEvent(new PlayerRespawnedEvent());
-            }
         }
-
-        protected virtual void OnCollisionEnter2D(Collision2D other)
+        
+        public void AddToTransformPosition(Vector2 positionOffset)
         {
-            if ((_collision.HazardLayer.value & (1 << other.gameObject.layer)) != 0)
-            {
-                EntityRigidbody.velocity = Vector2.zero;
-                EntityRigidbody.bodyType = RigidbodyType2D.Static;
-                EntityCollider.enabled = false;
-                IsDead = true;
-                EntityDiedAction?.Invoke();
-                if (this is PlayerEntity)
-                {
-                    EventManager.TriggerEvent(new PlayerDiedEvent());
-                }
-            }
+            transform.position += (Vector3)positionOffset;
         }
 
         private void OnDrawGizmosSelected()

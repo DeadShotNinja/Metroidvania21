@@ -23,6 +23,9 @@ namespace Metro
         public Vector2 MoveInput { get; set; }
         public InputState JumpInput { get; set; }
         public InputState DashInput { get; set; }
+        public InputState TimeSwapInput { get; set; }
+        public InputState InteractInput { get; set; }
+        
         public StateMachine<BaseBehaviourState> BehaviourStateMachine { get; private set; }
 
         #region Behaviour States
@@ -39,6 +42,8 @@ namespace Metro
             
             JumpInput = new InputState();
             DashInput = new InputState();
+            TimeSwapInput = new InputState();
+            InteractInput = new InputState();
 
             BehaviourStateMachine = new StateMachine<BaseBehaviourState>();
 

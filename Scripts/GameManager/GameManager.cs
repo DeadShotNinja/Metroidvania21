@@ -17,14 +17,14 @@ namespace Metro
             PlayerInputHandler = GetComponent<InputHandler>();
         }
 
-        private void Update()
-        {
-            // TODO: this will get moved to player state (maybe ability or special ability?)
-            if (Input.GetKeyDown(KeyCode.F) || Input.GetMouseButtonDown(1))
-            {
-                EventManager.TriggerEvent(new RequestPeriodChangeEvent());
-            }
-        }
+        // private void Update()
+        // {
+        //     // TODO: this will get moved to player state (maybe ability or special ability?)
+        //     // if (Input.GetKeyDown(KeyCode.F) || Input.GetMouseButtonDown(1))
+        //     // {
+        //     //     EventManager.TriggerEvent(new RequestPeriodChangeEvent());
+        //     // }
+        // }
         
         protected override void OnApplicationQuit()
         {

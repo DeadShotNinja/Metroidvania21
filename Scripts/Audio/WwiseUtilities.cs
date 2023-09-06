@@ -1,6 +1,6 @@
 /*
  * An ongoing set of functions for controlling behavior withing Wwise
- * @ Jacob Wolfe 20
+ * @ Jacob Wolfe '20
 */
 
 
@@ -12,9 +12,14 @@ public class WwiseUtilities : MonoBehaviour
 {
     // Instantiate Singleton Class "WwiseUtilities"
     public static WwiseUtilities instance { get; private set; }
-    public string[] RTPCNames;
-    public string[] AKEnvironmentNames;
-    public float[] InitialAKEnvironmentValues;
+    
+    [Header("RTPC Names as they appear in Wwise")]
+    [SerializeField] private string[] RTPCNames;
+    [Header("AK Environment Names as they appear in Wwise")]
+    [SerializeField] private string[] AKEnvironmentNames;
+    [Header("Initial AK Environment Values")]
+    [SerializeField] private float[] InitialAKEnvironmentValues;
+    
     // Used to set RTPC values over a given time period
     private Dictionary<string, RTPC> RTPCs = new Dictionary<string, RTPC>();
 
@@ -73,7 +78,7 @@ public class WwiseUtilities : MonoBehaviour
         }
         else
         { 
-            Debug.Log("RTPC Not Found");
+            Debug.LogWarning("RTPC Not Found");
             return -1.0f;
         }
     }

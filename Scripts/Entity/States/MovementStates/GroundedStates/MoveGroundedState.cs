@@ -1,3 +1,4 @@
+using Cinemachine;
 using MoreMountains.Feedbacks;
 
 namespace Metro
@@ -7,6 +8,8 @@ namespace Metro
     /// </summary>
     public class MoveGroundedState : SuperGroundedState
     {
+        private CinemachineBrain _camBrain;
+        
         public MoveGroundedState(BaseEntity entity, MMFeedbacks feedbacks, 
             StateMachine<BaseMovementState> stateMachine) : base(entity, feedbacks, stateMachine) { }
 
@@ -15,6 +18,8 @@ namespace Metro
             base.Enter();
             
             _entity.StateText.SetText("MOVING");
+
+            _camBrain = LevelManager.Instance.PlayerCamera.GetComponent<CinemachineBrain>();
         }
 
         public override void LogicUpdate()
@@ -31,9 +36,19 @@ namespace Metro
         public override void PhysicsUpdate()
         {
             base.PhysicsUpdate();
+            
+            UpdateCameraIfPlayer();
+            
             _horizontalMove.ApplyMovement(_entity.InputProvider.MoveInput.x);
         }
-        
+
+        public override void Exit()
+        {
+            base.Exit();
+            
+            UpdateCameraOnExitIfPlayer();
+        }
+
         private bool ShouldSwitchToIdle()
         {
             if (_colLeft && _entity.InputProvider.MoveInput.x < 0f)
@@ -43,6 +58,30 @@ namespace Metro
                 return true;
 
             return _entity.InputProvider.MoveInput.x == 0f;
+        }
+        
+        // TODO: these two if player functions are not appropriate, if there is time they can be refactored.
+        private void UpdateCameraIfPlayer()
+        {
+            if (_entity is PlayerEntity)
+            {
+                if (_entity.IsAttached && _camBrain.m_UpdateMethod != CinemachineBrain.UpdateMethod.FixedUpdate)
+                {
+                    _camBrain.m_UpdateMethod = CinemachineBrain.UpdateMethod.FixedUpdate;
+                }
+                if (!_entity.IsAttached && _camBrain.m_UpdateMethod != CinemachineBrain.UpdateMethod.LateUpdate)
+                {
+                    _camBrain.m_UpdateMethod = CinemachineBrain.UpdateMethod.LateUpdate;
+                }
+            }
+        }
+        
+        private void UpdateCameraOnExitIfPlayer()
+        {
+            if (_entity is PlayerEntity)
+            {
+                _camBrain.m_UpdateMethod = CinemachineBrain.UpdateMethod.LateUpdate;
+            }
         }
     }
 }

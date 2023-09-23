@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Metro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class AudioStateManager : MonoBehaviour
 {
@@ -31,80 +32,139 @@ public class AudioStateManager : MonoBehaviour
     [SerializeField] private AK.Wwise.State PlayerLocationLevel_Level1;
     [SerializeField] private AK.Wwise.State PlayerLocationLevel_Level2;
     [SerializeField] private AK.Wwise.State PlayerLocationLevel_Level3;
-    [SerializeField] private AK.Wwise.State PlayerLocationLevel_Level4;
 
     [Header("Dimension State Variables")]
     [SerializeField] private AK.Wwise.State Dimension_None;
     [SerializeField] private AK.Wwise.State Dimension_Past;
     [SerializeField] private AK.Wwise.State Dimension_Present;
 
-    [Header("Player Ability Search Variables")]
-    [SerializeField] private AK.Wwise.State PlayerAbilitySearch_None;
-    [SerializeField] private AK.Wwise.State PlayerAbilitySearch_Ability1;
-    [SerializeField] private AK.Wwise.State PlayerAbilitySearch_Ability2;
-    [SerializeField] private AK.Wwise.State PlayerAbilitySearch_Ability3;
-    [SerializeField] private AK.Wwise.State PlayerAbilitySearch_Ability4;
-    [SerializeField] private AK.Wwise.State PlayerAbilitySearch_Ability5;
-
-    // Add Soundbanks from Inspector
-    [Header("Soundbanks to Load on Initialization")]
-    [SerializeField] private List<AK.Wwise.Bank> Soundbanks;
-
-    // Main Music Play/Stop Events
-    [Header("Wwise Music Events")]
-    [SerializeField] private AK.Wwise.Event PlayMainMusic;
-    [SerializeField] private AK.Wwise.Event StopMainMusic;
-
-    // Start is called before the first frame updates
-    void Start()
+    // Awake
+    private void Awake()
     {
-        // Update States Accordingly
+        ChangeWwiseState(Game_None);
+        ChangeWwiseState(Music_None);
+        ChangeWwiseState(PlayerLocationLevel_None);
+        ChangeWwiseState(Dimension_None);
     }
-
-    // TODO: EXAMPLE
+    // On Enable
     private void OnEnable()
     {
+        SceneManager.sceneLoaded += OnSceneLoaded;
         EventManager.StartListening<WinGameEvent>(OnGameWon);
+        EventManager.StartListening<TimeChangedEvent>(OnDimensionChanged);
         EventManager.StartListening<PlayerDiedEvent>(OnPlayerDied);
         EventManager.StartListening<PlayerRespawnedEvent>(OnPlayerRespawn);
+        EventManager.StartListening<ChangeRoomEvent>(OnRoomChange);
+        EventManager.StartListening<GameStateChangedEvent>(OnGameStateChanged);
+    }
+    // On Disable
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        EventManager.StopListening<WinGameEvent>(OnGameWon);
+        EventManager.StopListening<TimeChangedEvent>(OnDimensionChanged);
+        EventManager.StopListening<PlayerDiedEvent>(OnPlayerDied);
+        EventManager.StopListening<PlayerRespawnedEvent>(OnPlayerRespawn);
+        EventManager.StopListening<ChangeRoomEvent>(OnRoomChange);
+        EventManager.StopListening<GameStateChangedEvent>(OnGameStateChanged);
+    }
+    // On Game State Changed
+    private void OnGameStateChanged(GameStateChangedEvent eventData)
+    {
+        if (eventData.State == GameState.Playing)
+        {
+            ChangeWwiseState(Music_LevelStart);
+            ChangeWwiseState(Game_Gameplay);
+        }
+        else
+        {
+            ChangeWwiseState(Game_GamePaused);
+            ChangeWwiseState(Music_PauseMenu);
+        }
+    }
+    // On Dimension Changed
+    private void OnDimensionChanged(TimeChangedEvent eventData)
+    {
+        if (eventData.IsPresent)
+        {
+            ChangeWwiseState(Dimension_Present);
+        }
+        else
+        {
+            ChangeWwiseState(Dimension_Past);
+        }
+    }
+    // On Scene Loaded
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Main Menu
+        if (SceneManager.GetActiveScene().buildIndex == 2)
+        {
+            ChangeWwiseState(Game_MainMenu);
+            ChangeWwiseState(Music_MainMenu);
+        }
+        // Gameplay
+        else if (SceneManager.GetActiveScene().buildIndex == 3)
+        {
+            ChangeWwiseState(Game_Gameplay);
+            ChangeWwiseState(Music_LevelStart);
+        }
+        // Credits
+        else if (SceneManager.GetActiveScene().buildIndex == 4)
+        {
+            // Needs to be changed to Credit state and set up in Wwise
+            ChangeWwiseState(Game_MainMenu);
+            ChangeWwiseState(Music_MainMenu);
+        }
     }
     // On Game Won
     private void OnGameWon(WinGameEvent eventData)
     {
-        Game_GameWin.SetValue();
-        Music_LevelWin.SetValue();
+        ChangeWwiseState(Game_GameWin);
+        ChangeWwiseState(Music_LevelWin);
     }
     // On Player Died
     private void OnPlayerDied(PlayerDiedEvent eventData)
     {
-        Game_GameLose.SetValue();
-        Music_LevelLose.SetValue();
+        ChangeWwiseState(Game_GameLose);
+        ChangeWwiseState(Music_LevelLose);
     }
     // On Player Respawn
     private void OnPlayerRespawn(PlayerRespawnedEvent eventData)
     {
-        Game_Gameplay.SetValue();
+        ChangeWwiseState(Game_Gameplay);
+        ChangeWwiseState(Music_LevelStart);
     }
-    private void OnDestroy()
+    // On Room Change
+    private void OnRoomChange(ChangeRoomEvent eventData)
     {
-        EventManager.StopListening<WinGameEvent>(OnGameWon);
-        EventManager.StopListening<PlayerDiedEvent>(OnPlayerDied);
-        EventManager.StopListening<PlayerRespawnedEvent>(OnPlayerRespawn);
-    }
-    // TODO: Put load soundbanks in a singleton.
-    void LoadSoundbanks()
-    {
-        if (Soundbanks.Count > 0)
+        if (eventData.TargetRoomID == 1 || eventData.TargetRoomID == 2 || eventData.TargetRoomID == 3) 
         {
-            foreach (AK.Wwise.Bank bank in Soundbanks)
-            {
-                bank.Load();
-            }
-            Debug.Log("Startup Soundbanks have been loaded.");
+            ChangeWwiseState(PlayerLocationLevel_Level1);
+        }
+        else if (eventData.TargetRoomID == 4 || eventData.TargetRoomID == 5 || eventData.TargetRoomID == 6)
+        {
+            ChangeWwiseState(PlayerLocationLevel_Level2);
+        }
+        else if (eventData.TargetRoomID == 7 || eventData.TargetRoomID == 8 || eventData.TargetRoomID == 9)
+        {
+            ChangeWwiseState(PlayerLocationLevel_Level3);
         }
         else
         {
-            Debug.LogWarning("No Soundbanks Loaded! Are Banks assigned in Audio State Manager?");
+            Debug.LogWarning("On Room Change was called in AudioStateManager, but no State was set!");
+        }
+    }
+    // Function to set State to Wwise
+    private void ChangeWwiseState(AK.Wwise.State state)
+    {
+        if (state.IsValid())
+        {
+            state.SetValue();
+        }
+        else
+        {
+            Debug.LogWarning("Wwise State change for " + state.Name + "was called, but State is not valid. Is it assigned in the Inspector?");
         }
     }
 }

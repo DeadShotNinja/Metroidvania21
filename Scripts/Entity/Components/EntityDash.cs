@@ -7,6 +7,7 @@ namespace Metro
     public class EntityDash : EntityComponent
     {
         [Header("Dash Setup")]
+        [SerializeField] private bool _allowDash = true;
         [Tooltip("How long we dash for")]
         [SerializeField] private float _dashDuration;
         [Tooltip("How fast we dash")]
@@ -20,8 +21,9 @@ namespace Metro
         private float _dashCount;
         private float _timeSinceLastDash;
 
-        public float TimeSinceLastDash { get => _timeSinceLastDash;}
-        public float DashDuration { get => _dashDuration; }
+        public bool AllowDash => _allowDash;
+        public float TimeSinceLastDash => _timeSinceLastDash;
+        public float DashDuration => _dashDuration;
 
         public override void Initialize(BaseEntity entity)
         {
@@ -75,6 +77,11 @@ namespace Metro
             }
 
             return null;
+        }
+
+        public void SetDashAllowed(bool isAllowed)
+        {
+            _allowDash = isAllowed;
         }
     }
 }

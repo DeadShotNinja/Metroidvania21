@@ -9,9 +9,10 @@ namespace Metro
 		
 		public void EnterState(FallingProp prop)
 		{
-			//_isAlive = false;
-			//_isFalling = false;
-			prop.Rigidbody2D.simulated = false;
+            if (GameDatabase.Instance != null)
+                GameDatabase.Instance.GetEnvironmentAudioEvent(EnvironmentAudioType.Play_CeilingSpikeImpact)?.Post(prop.gameObject);
+
+            prop.Rigidbody2D.simulated = false;
 			if (prop.SpriteRenderer != null) prop.SpriteRenderer.enabled = false;
 			prop.Collider2D.enabled = false;
 

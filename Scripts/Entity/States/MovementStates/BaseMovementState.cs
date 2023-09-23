@@ -9,16 +9,14 @@ namespace Metro
     public abstract class BaseMovementState : BaseState<BaseMovementState>
     {
         protected BaseEntity _entity;
-        protected MMFeedbacks _feedbacks;
         protected EntityHorizontalMove _horizontalMove;
         protected EntityJump _jump;
         protected EntityWallSlide _wallSlide;
         protected EntityDash _dash;
 
-        protected BaseMovementState(BaseEntity entity, MMFeedbacks feedbacks, StateMachine<BaseMovementState> stateMachine) : base(stateMachine)
+        protected BaseMovementState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(stateMachine)
         {
             _entity = entity;
-            _feedbacks = feedbacks;
             foreach (EntityComponent component in _entity.EntityComponents)
             {
                 if (component is EntityHorizontalMove move)

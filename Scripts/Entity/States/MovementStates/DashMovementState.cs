@@ -1,4 +1,3 @@
-using MoreMountains.Feedbacks;
 using UnityEngine;
 
 namespace Metro
@@ -8,14 +7,19 @@ namespace Metro
 		private Vector2 _dashDir;
 		private BreakableProp _breakableProp;
 		
-		public DashMovementState(BaseEntity entity, MMFeedbacks feedbacks, 
-			StateMachine<BaseMovementState> stateMachine) : base(entity, feedbacks, stateMachine) { }
+		public DashMovementState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine) { }
 
 		public override void Enter()
 		{
 			base.Enter();
 			
 			_entity.StateText.SetText("DASHING");
+			if (_entity.EntityAnimator != null) _entity.EntityAnimator.SetBool(_entity.AnimatorData.DashingBool, true);
+			if (GameDatabase.Instance != null)
+			{
+				GameDatabase.Instance.GetEntityAudioEvent(EntityAudioType.Play_PlayerDash)?.Post(_entity.gameObject);
+			}
+
 			_dash.Dash();
 			_dashDir = _entity.InputProvider.MoveInput;
 
@@ -65,6 +69,8 @@ namespace Metro
 			{
 				_breakableProp.ResetCollider();
 			}
+			
+			if (_entity.EntityAnimator != null) _entity.EntityAnimator.SetBool(_entity.AnimatorData.DashingBool, false);
 		}
 		
 		private bool ShouldSwitchToFall()

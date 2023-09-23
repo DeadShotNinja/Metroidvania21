@@ -94,6 +94,7 @@ namespace Metro
 		
 		private void OnPlayerDied(PlayerDiedEvent eventData)
 		{
+			if (_levelManager.PlayerDiedFeedbacks != null) _levelManager.PlayerDiedFeedbacks.PlayFeedbacks();
 			_stateMachine.ChangeState(_levelManager.RespawnLevelState);
 		}
 	}

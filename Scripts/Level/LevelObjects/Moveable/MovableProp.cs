@@ -121,7 +121,9 @@ namespace Metro
 			{
 				Vector2 waypointPosition = initialPosition + _waypoints[i];
 				Gizmos.DrawWireSphere(waypointPosition, 0.3f);
+#if UNITY_EDITOR
 				UnityEditor.Handles.Label(waypointPosition, i.ToString(), labelStyle);
+#endif
 
 				if (i < _waypoints.Length - 1)
 				{

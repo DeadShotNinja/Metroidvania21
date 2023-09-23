@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Metro
 {
-	public class HUDPanel : MonoBehaviour
+	public class IntroStateEvent : MonoBehaviour
 	{
 		    
 	}

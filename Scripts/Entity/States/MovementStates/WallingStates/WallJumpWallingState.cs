@@ -4,14 +4,14 @@ namespace Metro
 {
 	public class WallJumpWallingState : SuperWallingState
 	{
-		public WallJumpWallingState(BaseEntity entity, MMFeedbacks feedbacks, 
-			StateMachine<BaseMovementState> stateMachine) : base(entity, feedbacks, stateMachine) { }
+		public WallJumpWallingState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine) { }
 
 		public override void Enter()
 		{
 			base.Enter();
 
 			_entity.StateText.SetText("WALL-JUMPING");
+            if (GameDatabase.Instance != null) GameDatabase.Instance.GetEntityAudioEvent(EntityAudioType.Play_PlayerJump)?.Post(_entity.gameObject);
 
             _jump.PerformWallJump();
         }

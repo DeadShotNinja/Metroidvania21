@@ -89,46 +89,11 @@ namespace Metro
 		public void Activate()
 		{
 			if (_currentState == IdleState) ChangeState(FireState);
-			
-			//_isActive = true;
-			//ScheduleNextShot();
 		}
 		
 		public void Deactivate()
 		{
 			if (_currentState != IdleState) ChangeState(IdleState);
-
-			// _isActive = false;
-			// StopCoroutine(_currentCoroutine);
-			// _currentCoroutine = null;
 		}
-		
-		// private void ScheduleNextShot()
-		// {
-		// 	if (!_isActive || _currentCoroutine != null) return;
-		//
-		// 	float fireRate = _randomFireRate ? UnityEngine.Random.Range(_minFireRate, _maxFireRate) : _constFireRate;
-		// 	_currentCoroutine = StartCoroutine(Fire(fireRate));
-		// }
-		//
-		// private IEnumerator Fire(float rate)
-		// {
-		// 	BaseProjectile projectile = ProjectilePooler.Instance.GetFromPool(_projectilePrefab);
-		// 	if (projectile == null)
-		// 	{
-		// 		Debug.LogError("Missing Projectile script on projectile or it's not in the ProjectilePooler");
-		// 		_currentCoroutine = null;
-		// 		yield break;
-		// 	}
-		//
-		// 	projectile.transform.position = _projectileSpawnPoint.position;
-		// 	projectile.Launch(_fireDirection, _projectileSpeed);
-		// 	_onFireFeedbacks.PlayFeedbacks();
-		//
-		// 	yield return new WaitForSeconds(rate);
-		//
-		// 	_currentCoroutine = null;
-		// 	ScheduleNextShot();
-		// }
 	}
 }

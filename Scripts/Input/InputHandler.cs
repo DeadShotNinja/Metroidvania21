@@ -56,6 +56,20 @@ namespace Metro
             InteractInput.Reset();
         }
 
+        public void ChangeControllType(bool isPauseMenu)
+        {
+            if (isPauseMenu)
+            {
+                _playerInputActions.Player.Disable();
+                _playerInputActions.UI.Enable();
+            }
+            else
+            {
+                _playerInputActions.Player.Enable();
+                _playerInputActions.UI.Disable();
+            }
+        }
+
         private void OnPlayerControlsToggled(PlayerControlsEvent eventData)
         {
             if (eventData.ControlsEnabled)

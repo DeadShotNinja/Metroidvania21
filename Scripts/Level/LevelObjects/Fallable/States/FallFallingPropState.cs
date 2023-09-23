@@ -15,6 +15,9 @@ namespace Metro
 		{
 			if (ShouldSetupFalling(prop.CollisionCheckBuffer))
 			{
+				if (GameDatabase.Instance != null)
+					GameDatabase.Instance.GetEnvironmentAudioEvent(EnvironmentAudioType.Play_CeilingSpikeFall)?.Post(prop.gameObject);
+
 				prop.Rigidbody2D.isKinematic = false;
 				prop.Rigidbody2D.simulated = true;
 				prop.Collider2D.enabled = true;

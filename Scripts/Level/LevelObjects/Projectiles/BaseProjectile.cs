@@ -66,5 +66,5 @@ namespace Metro
 			_collider2D.enabled = true;
 			_spriteRenderer.enabled = true;
 		}
-	}
+    }
 }

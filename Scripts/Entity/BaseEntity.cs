@@ -21,6 +21,9 @@ namespace Metro
         [Tooltip("Time to wait before respawning the entity.")]
         [SerializeField] private float _respawnDelay = 1f;
         
+        [Header("Animator Params")]
+        [SerializeField] private EntityAnimatorData _animatorData;
+        
         [Header("MMFeedbacks")]
         [SerializeField] private FeedbacksData _feedbacks;
         
@@ -29,14 +32,18 @@ namespace Metro
        
         public EntityCollision Collision => _collision;
         public EntityGravity Gravity => _gravity;
+        public EntityAnimatorData AnimatorData => _animatorData;
+        public FeedbacksData Feedbacks => _feedbacks;
         
         public Rigidbody2D EntityRigidbody { get; protected set; }
         public Collider2D EntityCollider { get; protected set; }
+        public Animator EntityAnimator { get; protected set; }
         public EntityComponent[] EntityComponents { get; protected set; }
         public IInputProvider InputProvider { get; protected set; }
 
         public bool IsDead { get; protected set; }
         public bool IsAttached { get; set; }
+        public bool IsInvulerable { get; protected set; }
 
         public StateMachine<BaseMovementState> MovementStateMachine { get; private set; }
 
@@ -71,22 +78,27 @@ namespace Metro
             MovementStateMachine = new StateMachine<BaseMovementState>();
             
             // Airborne
-            JumpAirborneState = new JumpAirborneState(this, _feedbacks.JumpFeedbacks, MovementStateMachine);
-            FallAirborneState = new FallAirborneState(this, _feedbacks.FallFeedbacks, MovementStateMachine);
-            WallSlideWallingState = new WallSlideWallingState(this, _feedbacks.WallSlideFeedbacks, MovementStateMachine);
-            WallJumpWallingState = new WallJumpWallingState(this, _feedbacks.WallJumpFeedbacks, MovementStateMachine);
+            JumpAirborneState = new JumpAirborneState(this, MovementStateMachine);
+            FallAirborneState = new FallAirborneState(this, MovementStateMachine);
+            WallSlideWallingState = new WallSlideWallingState(this, MovementStateMachine);
+            WallJumpWallingState = new WallJumpWallingState(this, MovementStateMachine);
             // Grounded
-            IdleGroundedState = new IdleGroundedState(this, _feedbacks.IdleGroundedFeedbacks, MovementStateMachine);
-            MoveGroundedState = new MoveGroundedState(this, _feedbacks.MoveGroundedFeedbacks, MovementStateMachine);
+            IdleGroundedState = new IdleGroundedState(this, MovementStateMachine);
+            MoveGroundedState = new MoveGroundedState(this, MovementStateMachine);
             // Both
-            DashMovementState = new DashMovementState(this, _feedbacks.DashFeedbacks, MovementStateMachine);
+            DashMovementState = new DashMovementState(this, MovementStateMachine);
             
             MovementStateMachine.Initialize(FallAirborneState);
         }
-        
-        protected virtual void Start()
+
+        protected virtual void OnEnable()
         {
             
+        }
+
+        protected virtual void Start()
+        {
+            FindAnimator();
         }
         
         protected virtual void Update()
@@ -122,6 +134,11 @@ namespace Metro
 
         public virtual void TakeDamage()
         {
+            if (IsInvulerable) return;
+
+            if (GameDatabase.Instance != null)
+                GameDatabase.Instance.GetEnvironmentAudioEvent(EnvironmentAudioType.Play_FloorSpikeHit)?.Post(gameObject);
+
             EntityRigidbody.velocity = Vector2.zero;
             EntityRigidbody.bodyType = RigidbodyType2D.Static;
             EntityCollider.enabled = false;
@@ -149,13 +166,27 @@ namespace Metro
         {
             transform.position += (Vector3)positionOffset;
         }
+        
+        private void FindAnimator()
+        {
+            AnimatorLocator animLocator = GetComponentInChildren<AnimatorLocator>();
+            if (animLocator == null)
+            {
+                Debug.LogError("No AnimatorLocator found in children of " + gameObject.name +
+                               ". Animations will not work.");
+            }
+            else
+            {
+                EntityAnimator = animLocator.GetAnimator();
+            }
+        }
 
         private void OnDrawGizmosSelected()
         {
             _collision.GizmosToDraw(transform.position);
         }
 
-        private void OnDestroy()
+        protected virtual void OnDestroy()
         {
             foreach (EntityComponent component in EntityComponents)
             {

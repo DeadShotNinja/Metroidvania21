@@ -7,14 +7,15 @@ namespace Metro
 	{
 		protected bool _colLeft, _colRight, _colUp;
 		
-		protected SuperGroundedState(BaseEntity entity, MMFeedbacks feedbacks, 
-			StateMachine<BaseMovementState> stateMachine) : base(entity, feedbacks, stateMachine) { }
+		protected SuperGroundedState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine) { }
 
 		public override void Enter()
 		{
 			base.Enter();
 			
-			if (Time.time - _jump.LastJumpPressed <= _jump.JumpPreBufferTime)
+			if (_entity.EntityAnimator != null) _entity.EntityAnimator.SetBool(_entity.AnimatorData.GroundedBool, true);            
+
+            if (Time.time - _jump.LastJumpPressed <= _jump.JumpPreBufferTime)
 			{
 				_entity.MovementStateMachine.ChangeState(_entity.JumpAirborneState);
 				return;
@@ -47,9 +48,19 @@ namespace Metro
 				return;
 			}
 		}
-		
+
+		public override void Exit()
+		{
+			base.Exit();
+			
+			if (_entity.EntityAnimator != null) _entity.EntityAnimator.SetBool(_entity.AnimatorData.GroundedBool, false);
+		}
+
 		private bool ShouldSwitchToJump()
 		{
+			if (!_entity.Collision.IsGrounded && _entity.EntityRigidbody.velocity.y > 0f)
+				return true;
+			
 			if (!_entity.InputProvider.JumpInput.Pressed)
 				return false;
 			_jump.LastJumpPressed = Time.time;
@@ -65,7 +76,7 @@ namespace Metro
 		
 		private bool ShouldSwitchToDash()
 		{
-			if (!_dash.CanDash())
+			if (!_dash.CanDash() || !_dash.AllowDash)
 				return false;
 
 			return _entity.InputProvider.DashInput.Pressed;

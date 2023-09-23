@@ -25,7 +25,10 @@ namespace Metro
 		{
 			if (other.gameObject.CompareTag("Player"))
 			{
-				_collider2D.enabled = false;
+				if (GameDatabase.Instance != null) 
+					GameDatabase.Instance.GetEnvironmentAudioEvent(EnvironmentAudioType.Play_DestoryTrapWall)?.Post(gameObject);
+
+                _collider2D.enabled = false;
 				ActivatePieces(other.gameObject.transform.position);
 			}
 		}

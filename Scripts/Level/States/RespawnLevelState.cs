@@ -12,6 +12,8 @@ namespace Metro
 			
 			EventManager.StartListening<PlayerRespawnedEvent>(OnPlayerRespawned);
 			
+
+
 			_levelManager.PlayerEntity.EntityRespawn(_levelManager.CheckPoint);
 		}
 
@@ -34,7 +36,14 @@ namespace Metro
 		
 		private void OnPlayerRespawned(PlayerRespawnedEvent eventData)
 		{
-			_stateMachine.ChangeState(_levelManager.GameplayLevelState);
+			if (_levelManager.CheckPointInPresent && _levelManager.TimeState == TimeState.Present)
+			{
+                _stateMachine.ChangeState(_levelManager.GameplayLevelState);
+            }
+			else
+			{
+				_stateMachine.ChangeState(_levelManager.TimeSwapLevelState);
+			}			
 		}
 	}
 }

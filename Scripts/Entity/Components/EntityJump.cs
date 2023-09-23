@@ -64,6 +64,16 @@ namespace Metro
             _entity.Collision.OnGrounded -= Event_OnGrounded;
         }
         
+        public void ModifyJumps(int amountToAdd)
+        {
+            _allowedJumps += amountToAdd;
+        }
+        
+        public void ModifyAllowWalljump(bool isAllowed)
+        {
+            _allowWallJumping = isAllowed;
+        }
+        
         public void PerformJump()
         {
             JumpCount++;

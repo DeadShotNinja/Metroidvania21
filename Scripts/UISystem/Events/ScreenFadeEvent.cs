@@ -3,12 +3,12 @@ namespace Metro
 	public struct ScreenFadeEvent
 	{
 		public ScreenFadeType FadeType;
-		public float FadeSpeed;
+		public float FadeDuration;
 		
-		public ScreenFadeEvent(ScreenFadeType fadeType, float fadeSpeed)
+		public ScreenFadeEvent(ScreenFadeType fadeType, float fadeDuration)
 		{
 			FadeType = fadeType;
-			FadeSpeed = fadeSpeed;
+			FadeDuration = fadeDuration;
 		}
 	}
 }

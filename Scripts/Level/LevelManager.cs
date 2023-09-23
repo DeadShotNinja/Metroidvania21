@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using MoreMountains.Feedbacks;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -32,13 +33,13 @@ namespace Metro
 		
 		[Header("Room/Transitional Fading")]
 		[Tooltip("The amount of time it will take to transition from one room to the next (fading out")]
-		[SerializeField] private float _roomFadeOutSpeed = 0.5f;
+		[SerializeField] private float _roomFadeOutDuration = 0.5f;
 		[Tooltip("The amount of time it will take to transition from one room to the next (fading in")]
-		[SerializeField] private float _roomFadeInSpeed = 0.5f;
+		[SerializeField] private float _roomFadeInDuration = 0.5f;
 		[Tooltip("How long it takes to fade out when swapping time periods.")]
-		[SerializeField] private float _swapFadeOutSpeed = 0.5f;
+		[SerializeField] private float _swapFadeOutDuration = 0.5f;
 		[Tooltip("How long it takes to fade in when swapping time periods.")]
-		[SerializeField] private float _swapFadeInSpeed = 0.5f;
+		[SerializeField] private float _swapFadeInDuration = 0.5f;
 		
 		[Header("Post-Processing Setup")]
 		[Tooltip("If the post processing prefab is in the scene, make sure to tick this true.")]
@@ -50,6 +51,10 @@ namespace Metro
 		[SerializeField] private VolumeProfile _pastProfile;
 		[Tooltip("Profile used for Present time frame.")]
 		[SerializeField] private VolumeProfile _presentProfile;
+
+		[Header("Feedbacks")]
+		[SerializeField] private MMFeedbacks _playerDiedFeedback;
+		[SerializeField] private MMFeedbacks _failTimeSwitchFeedback;
 
 		[Header("Debugging")]
 		[SerializeField] private bool _drawRoomSwapGizmos;
@@ -67,14 +72,17 @@ namespace Metro
 		public Volume PostProcessVolume { get; set; }
 		public VolumeProfile PastProfile => _pastProfile;
 		public VolumeProfile PresentProfile => _presentProfile;
+		public MMFeedbacks PlayerDiedFeedbacks => _playerDiedFeedback;
+		public MMFeedbacks FailTimeSwitchFeedbacks => _failTimeSwitchFeedback;
+
 		public bool DrawRoomSwapGizmos => _drawRoomSwapGizmos;
 		public GameObject[] RoomHolderPrefabs => _roomHolderPrefabs;
 		public int StartingRoomID => _startingRoomID;
 		public int StartingSpawnID => _startingSpawnID;
-		public float RoomFadeOutSpeed => _roomFadeOutSpeed;
-		public float RoomFadeInSpeed => _roomFadeInSpeed;
-		public float SwapFadeOutSpeed => _swapFadeOutSpeed;
-		public float SwapFadeInSpeed => _swapFadeInSpeed;
+		public float RoomFadeOutDuration => _roomFadeOutDuration;
+		public float RoomFadeInDuration => _roomFadeInDuration;
+		public float SwapFadeOutDuration => _swapFadeOutDuration;
+		public float SwapFadeInDuration => _swapFadeInDuration;
 
 		// TODO: do we meed this to be a public getter? Private may be more appropriate.
 		public List<Room> RoomHolders { get; private set; }
@@ -88,6 +96,7 @@ namespace Metro
 			set => _timeState = value;
 		}
 
+		public bool CheckPointInPresent { get; set; }
 		public Vector3 CheckPoint { get; set; }
 
 		public StateMachine<BaseLevelState> LevelStateMachine { get; private set; }

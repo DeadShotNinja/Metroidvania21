@@ -11,6 +11,7 @@ namespace Metro
 		private bool _isFadingOut;
 		private float _timeInState;
 		private Vector2 _cachedVeolicty;
+		private bool _goingToPresent;
 		
 		public TimeSwapLevelState(LevelManager levelManager, StateMachine<BaseLevelState> stateMachine) : base(levelManager, stateMachine) { }
 		public override void Enter()
@@ -42,8 +43,14 @@ namespace Metro
 			if (ShouldFadeOut())
 			{
 				_isFadingOut = true;
-				EventManager.TriggerEvent(new ScreenFadeEvent(ScreenFadeType.Out, _levelManager.SwapFadeOutSpeed));
 				TimeSwap();
+				if (GameDatabase.Instance != null) 
+					GameDatabase.Instance.GetEnvironmentAudioEvent(EnvironmentAudioType.Play_DimensionShift)?.Post(_levelManager.gameObject);
+
+				ProjectilePooler.Instance.ReturnAllToPool();
+
+				EventManager.TriggerEvent(new TimeChangedEvent(_goingToPresent, _levelManager.SwapFadeOutDuration));
+				EventManager.TriggerEvent(new ScreenFadeEvent(ScreenFadeType.Out, _levelManager.SwapFadeOutDuration));
 			}
 		}
 
@@ -57,7 +64,7 @@ namespace Metro
 			if (_timeSwapFailed)
 				return true;
 
-			return _timeInState + _levelManager.SwapFadeInSpeed + _levelManager.SwapFadeOutSpeed < Time.time;
+			return _timeInState + _levelManager.SwapFadeInDuration + _levelManager.SwapFadeOutDuration < Time.time;
 		}
 		
 		private bool ShouldFadeOut()
@@ -65,7 +72,7 @@ namespace Metro
 			if (_isFadingOut)
 				return false;
 			
-			return _timeInState + _levelManager.SwapFadeInSpeed < Time.time;
+			return _timeInState + _levelManager.SwapFadeInDuration < Time.time;
 		}
 		
 		private void AttemptTimeSwap()
@@ -79,9 +86,12 @@ namespace Metro
 				{
 					_levelManager.CurrentRoom.ShowPastVariant();
 					_timeSwapFailed = true;
+					//EventManager.TriggerEvent(new TimeSwapFailedEvent());
+					if (_levelManager.FailTimeSwitchFeedbacks != null) _levelManager.FailTimeSwitchFeedbacks.PlayFeedbacks();
 					return;
 				}
 				_levelManager.CurrentRoom.ShowPastVariant();
+				_goingToPresent = true;
 			}
 			else
 			{
@@ -90,14 +100,18 @@ namespace Metro
 				{
 					_levelManager.CurrentRoom.ShowPresentVariant();
 					_timeSwapFailed = true;
-					return;
+                    //EventManager.TriggerEvent(new TimeSwapFailedEvent());
+                    if (_levelManager.FailTimeSwitchFeedbacks != null) _levelManager.FailTimeSwitchFeedbacks.PlayFeedbacks();
+                    return;
 				}
 				_levelManager.CurrentRoom.ShowPresentVariant();
+				_goingToPresent = false;
 			}
 
 			_cachedVeolicty = _levelManager.PlayerEntity.EntityRigidbody.velocity;
 			_levelManager.PlayerEntity.EntityRigidbody.simulated = false;
-			EventManager.TriggerEvent(new ScreenFadeEvent(ScreenFadeType.In, _levelManager.SwapFadeInSpeed));
+            EventManager.TriggerEvent(new TimeChangedEvent(_goingToPresent, _levelManager.SwapFadeInDuration));
+            EventManager.TriggerEvent(new ScreenFadeEvent(ScreenFadeType.In, _levelManager.SwapFadeInDuration));
 		}
 		
 		private void TimeSwap()

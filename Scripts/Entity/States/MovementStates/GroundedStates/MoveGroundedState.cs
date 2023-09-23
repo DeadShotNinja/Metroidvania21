@@ -10,8 +10,7 @@ namespace Metro
     {
         private CinemachineBrain _camBrain;
         
-        public MoveGroundedState(BaseEntity entity, MMFeedbacks feedbacks, 
-            StateMachine<BaseMovementState> stateMachine) : base(entity, feedbacks, stateMachine) { }
+        public MoveGroundedState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine) { }
 
         public override void Enter()
         {
@@ -39,6 +38,8 @@ namespace Metro
             
             UpdateCameraIfPlayer();
             
+            if (_entity.EntityAnimator != null) _entity.EntityAnimator.SetFloat(_entity.AnimatorData.XInputFloat, 
+                _entity.InputProvider.MoveInput.x);
             _horizontalMove.ApplyMovement(_entity.InputProvider.MoveInput.x);
         }
 
@@ -47,6 +48,7 @@ namespace Metro
             base.Exit();
             
             UpdateCameraOnExitIfPlayer();
+            if (_entity.EntityAnimator != null) _entity.EntityAnimator.SetFloat(_entity.AnimatorData.XInputFloat, 0f);
         }
 
         private bool ShouldSwitchToIdle()

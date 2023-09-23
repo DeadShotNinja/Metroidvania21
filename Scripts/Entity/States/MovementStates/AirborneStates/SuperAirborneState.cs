@@ -7,8 +7,7 @@ namespace Metro
 	{
 		protected bool _colUp;
 		
-		protected SuperAirborneState(BaseEntity entity, MMFeedbacks feedbacks, 
-			StateMachine<BaseMovementState> stateMachine) : base(entity, feedbacks, stateMachine) { }
+		protected SuperAirborneState(BaseEntity entity, StateMachine<BaseMovementState> stateMachine) : base(entity, stateMachine) { }
 
 		public override void LogicUpdate()
 		{
@@ -40,13 +39,15 @@ namespace Metro
 		{
 			base.PhysicsUpdate();
 			
+			if (_entity.EntityAnimator != null) _entity.EntityAnimator.SetFloat(_entity.AnimatorData.XInputFloat, 
+				_entity.InputProvider.MoveInput.x);
 			// This needs to be modified for airborne movement.
 			_horizontalMove.ApplyMovement(_entity.InputProvider.MoveInput.x);
 		}
 		
 		private bool ShouldSwitchToDash()
 		{
-			if (!_dash.CanDash())
+			if (!_dash.CanDash() || !_dash.AllowDash)
 				return false;
 			
 			return _entity.InputProvider.DashInput.Pressed;
@@ -78,6 +79,9 @@ namespace Metro
 		
 		private bool ShouldSwitchToWallSlide()
 		{
+			if (!_wallSlide.AllowWallSlide)
+				return false;
+			
 			if (_entity.Collision.IsWallLeft && _entity.InputProvider.MoveInput.x < 0f)
 				return true;
 

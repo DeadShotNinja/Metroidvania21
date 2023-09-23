@@ -6,7 +6,9 @@ namespace Metro
 	{
 		public void EnterState(ProjectileFiringProp prop)
 		{
-			FireProjectile(prop);
+			if (GameDatabase.Instance != null) GameDatabase.Instance.GetEnvironmentAudioEvent(EnvironmentAudioType.Play_CannonShot)?.Post(prop.gameObject);
+
+            FireProjectile(prop);
 		}
 
 		public void UpdateState(ProjectileFiringProp prop)

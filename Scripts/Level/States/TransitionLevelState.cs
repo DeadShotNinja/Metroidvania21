@@ -17,7 +17,7 @@ namespace Metro
 
 			_stateTick = Time.time;
 			EventManager.TriggerEvent(new PlayerControlsEvent(false));
-			EventManager.TriggerEvent(new ScreenFadeEvent(ScreenFadeType.In, _levelManager.RoomFadeInSpeed));
+			EventManager.TriggerEvent(new ScreenFadeEvent(ScreenFadeType.In, _levelManager.RoomFadeInDuration));
 			TogglePlayerActive(false);
 		}
 
@@ -31,7 +31,7 @@ namespace Metro
 				SetPlayerPosition(_levelManager.QueuedSpawn);
 				ModifyCameraConfiner();
 				TogglePlayerActive(true);
-				EventManager.TriggerEvent(new ScreenFadeEvent(ScreenFadeType.Out, _levelManager.RoomFadeOutSpeed));
+				EventManager.TriggerEvent(new ScreenFadeEvent(ScreenFadeType.Out, _levelManager.RoomFadeOutDuration));
 				_stateMachine.ChangeState(_levelManager.GameplayLevelState);
 			}
 		}
@@ -46,7 +46,7 @@ namespace Metro
 		
 		private bool ShouldTransitionOutOfState()
 		{
-			return _stateTick + _levelManager.RoomFadeOutSpeed < Time.time;
+			return _stateTick + _levelManager.RoomFadeOutDuration < Time.time;
 		}
 		
 		private void ChangeRoom(Room newRoom)
@@ -74,6 +74,7 @@ namespace Metro
 		{
 			_levelManager.PlayerEntity.transform.position = spawnPos;
 			_levelManager.CheckPoint = spawnPos;
+			_levelManager.CheckPointInPresent = _levelManager.TimeState == TimeState.Present;
 		}
 		
 		private void ModifyCameraConfiner()

@@ -9,6 +9,7 @@ namespace Metro
         [SerializeField] protected List<Pool> m_Pools;
 
         protected Dictionary<GameObject, Queue<T>> m_PoolDictionary;
+        protected HashSet<T> m_ActiveObjects = new HashSet<T>();
 
         protected override void Awake()
         {
@@ -36,6 +37,7 @@ namespace Metro
 
             T pooledObj = m_PoolDictionary[prefab].Dequeue();
             pooledObj.gameObject.SetActive(true);
+            m_ActiveObjects.Add(pooledObj);
             return pooledObj;
         }
 
@@ -43,7 +45,20 @@ namespace Metro
         {
             objectToReturn.ResetPooledObject();
             objectToReturn.gameObject.SetActive(false);
+            m_ActiveObjects.Remove(objectToReturn);
             m_PoolDictionary[objectToReturn.OriginalPrefab].Enqueue(objectToReturn);
+        }
+
+        public virtual void ReturnAllToPool()
+        {
+            List<T> tempList = new List<T>(m_ActiveObjects);
+
+            foreach (T obj in tempList)
+            {
+                ReturnToPool(obj);
+            }
+
+            m_ActiveObjects.Clear();
         }
 
         protected virtual void CreatePool(GameObject prefab, int initialSize)

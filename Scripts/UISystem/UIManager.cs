@@ -1,3 +1,4 @@
+using PixelCrushers;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -28,22 +29,43 @@ namespace Metro
 		{
 			EventManager.StartListening<ScreenFadeEvent>(OnFadeScreen);
 			EventManager.StartListening<WinGameEvent>(OnWinGame);
+			EventManager.StartListening<GameStateChangedEvent>(OnGameStateChanged);
 		}
 
 		private void OnDisable()
 		{
 			EventManager.StopListening<ScreenFadeEvent>(OnFadeScreen);
 			EventManager.StopListening<WinGameEvent>(OnWinGame);
-		}
+            EventManager.StopListening<GameStateChangedEvent>(OnGameStateChanged);
+        }
 		
 		private void OnFadeScreen(ScreenFadeEvent eventData)
 		{
-			_fadePanel.FadeScreen(eventData.FadeType, eventData.FadeSpeed);
+			_fadePanel.FadeScreen(eventData.FadeType, eventData.FadeDuration);
 		}
 		
 		private void OnWinGame(WinGameEvent eventData)
 		{
-			_displayPanel.gameObject.SetActive(true);
+			//_displayPanel.gameObject.SetActive(true);
+			EventManager.TriggerEvent(new ScreenFadeEvent(ScreenFadeType.In, 3f));
+			Invoke(nameof(GoToCredits), 3f);
+		}
+
+		private void GoToCredits()
+		{
+			SceneLoader.LoadScene(4);
+		}
+
+		private void OnGameStateChanged(GameStateChangedEvent eventData)
+		{
+			if (eventData.State == GameState.Playing)
+			{
+                _pausePanel.gameObject.SetActive(false);
+            }
+			else
+			{
+                _pausePanel.gameObject.SetActive(true);
+            }			
 		}
 		
 		public void OnClick_GTFOButton()
